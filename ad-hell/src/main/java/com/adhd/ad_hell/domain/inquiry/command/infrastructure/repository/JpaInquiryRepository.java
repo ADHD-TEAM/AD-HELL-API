@@ -1,4 +1,4 @@
-package com.adhd.ad_hell.domain.inquiry.command.repository;
+package com.adhd.ad_hell.domain.inquiry.command.infrastructure.repository;
 
 import com.adhd.ad_hell.domain.inquiry.command.domain.aggregate.Inquiry;
 import com.adhd.ad_hell.domain.inquiry.command.domain.repository.InquiryRepository;

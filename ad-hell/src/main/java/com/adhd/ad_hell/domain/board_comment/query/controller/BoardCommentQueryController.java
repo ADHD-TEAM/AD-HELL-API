@@ -52,7 +52,7 @@ public class BoardCommentQueryController {
         return ResponseEntity.ok(boardCommentQueryService.findMyComments(req));
     }
 
-    /** 댓글 상세 조회 */
+    // 댓글 상세 조회
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<BoardCommentDetailResponse>> findCommentById(@PathVariable Long id) {
         return ResponseEntity.ok(boardCommentQueryService.findCommentById(id));
