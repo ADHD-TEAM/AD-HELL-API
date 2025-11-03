@@ -6,19 +6,21 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
 public class UserDTO {
+    private Long userId;
     private String roleType;
     private String loginId;
     private String nickname;
     private String email;
     private String status;
     private Long amount;
-//    private LocalDate deactivatedAt;
-//    private LocalDate deletedAt;
-//    private LocalDate createdAt;
-//    private LocalDate updatedAt;
+    private LocalDateTime deactivatedAt;
+    private LocalDateTime deletedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 }

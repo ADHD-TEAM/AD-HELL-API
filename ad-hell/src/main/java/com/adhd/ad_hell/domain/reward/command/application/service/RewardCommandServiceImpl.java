@@ -12,6 +12,8 @@ import com.adhd.ad_hell.domain.reward.command.domain.repository.RewardRepository
 import com.adhd.ad_hell.domain.reward.command.domain.repository.RewardStockRepository;
 import com.adhd.ad_hell.exception.BusinessException;
 import com.adhd.ad_hell.exception.ErrorCode;
+import com.adhd.ad_hell.mail.MailService;
+import com.adhd.ad_hell.mail.MailType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ public class RewardCommandServiceImpl implements RewardCommandService, RewardSto
   private final RewardRepository rewardRepository;
   private final RewardStockRepository rewardStockRepository;
   private final CategoryProvider categoryProvider;
+  private final MailService mailService;
 
   @Transactional
   public void createReward(CreateRewardRequest req) {
@@ -93,5 +96,12 @@ public class RewardCommandServiceImpl implements RewardCommandService, RewardSto
     }
 
     stock.markAsUsed();
+
+    try {
+      String code = stock.getPinNumber();
+      mailService.sendMail("zkvn1103@naver.com", "이민욱", MailType.REWARD, code);
+    } catch (Exception e) {
+      throw new RuntimeException("메일 전송 실패");
+    }
   }
 }

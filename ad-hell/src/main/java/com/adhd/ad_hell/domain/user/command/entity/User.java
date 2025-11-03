@@ -7,6 +7,7 @@ import com.adhd.ad_hell.domain.user.command.dto.request.UserModifyRequest;
 import com.adhd.ad_hell.domain.user.command.dto.request.UserSignUpRequest;
 
 
+import com.adhd.ad_hell.domain.user.query.dto.UserDTO;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -94,5 +95,15 @@ public class User extends BaseTimeEntity {
         } else if (status == UserStatus.DELETE) {
             this.deletedAt = LocalDateTime.now();
         }
+    }
+
+    public static User formUser(UserDTO userDTO) {
+        return User.builder()
+                .userId(userDTO.getUserId())
+                .loginId(userDTO.getLoginId())
+                .nickname(userDTO.getNickname())
+                .status(UserStatus.valueOf(userDTO.getStatus()))
+                .deletedAt(userDTO.getDeletedAt())
+                .build();
     }
 }
