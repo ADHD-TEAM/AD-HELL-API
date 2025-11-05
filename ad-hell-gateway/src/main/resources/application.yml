@@ -1,0 +1,38 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: ad-hell-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            # 1) 알림 서비스 라우팅
+            - id: ad-hell-notification-service
+              uri: lb://AD-HELL-NOTIFICATION-SERVICE
+              predicates:
+                - Path=/api/users/*/notifications/**,/api/admin/notifications/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: notificationService
+                    fallbackUri: forward:/fallback/notification
+
+            # 2) 나머지 전체 API는 core-service 로
+            - id: ad-hell-core-service
+              uri: lb://AD-HELL-CORE-SERVICE
+              predicates:
+                - Path=/api/**,/swagger-ui/**,/v3/api-docs/**
+                # 여기서는 특별한 필터 없어도 됨
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+jwt:
+  secret: BMy11e2DJ8kQ3yarTTTfLb1nWaQRW+xdcLSlZVKsrgvnp89M4WK6tymHE0NpSx5AYuHc6JhbgEnWL5Sl/RpCWg==

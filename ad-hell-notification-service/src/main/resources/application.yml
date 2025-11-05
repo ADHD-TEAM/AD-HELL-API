@@ -1,0 +1,29 @@
+server:
+  port: 8082
+
+spring:
+  data:
+    redis:
+      host: localhost    # 실제 Redis 서버 IP 또는 도메인
+      port: 6379         # 기본 포트
+  application:
+    name: AD-HELL-NOTIFICATION-SERVICE
+
+  datasource:
+    url: jdbc:mariadb://localhost:3306/advertise_system
+    username: ADHD
+    password: ADHD
+    driver-class-name: org.mariadb.jdbc.Driver
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: mappers/**/*.xml
+  type-aliases-package: com.adhd.ad_hell.domain.*.query.mapper
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka

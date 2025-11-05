@@ -1,0 +1,42 @@
+# Server Port \uACE0\uC815(Client \uB2E8\uC77C \uC9C4\uC785\uC810\uC73C\uB85C \uBCC0\uACBD\uB418\uBA74 \uC548\uB418\uB294 \uC18D\uC131)
+server:
+  port: 8000
+spring:
+  application:
+    name: gateway-server
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: 1st-service
+              # uri\uB294 http://ip:port \uC640 \uAC19\uC740 \uD615\uD0DC\uB85C \uC791\uC131\uD560 \uC218\uB3C4 \uC788\uC9C0\uB9CC
+              # \uC778\uC2A4\uD134\uC2A4\uC758 \uC8FC\uC18C\uB294 \uBCC0\uACBD \uAC00\uB2A5\uC131\uC774 \uC788\uC73C\uBBC0\uB85C service name\uC73C\uB85C \uC791\uC131\uD55C\uB2E4
+              # lb\uC758 \uC758\uBBF8\uB294 \uB85C\uB4DC\uBC38\uB7F0\uC2F1\uD558\uACA0\uB2E4\uB294 \uC758\uBBF8
+              uri: lb://1ST-SERVICE
+              predicates:
+                # \uC544\uB798\uC758 \uACBD\uB85C\uB85C \uC694\uCCAD\uC774 \uC654\uC744 \uB54C \uD574\uB2F9 \uB77C\uC6B0\uD305 \uC124\uC815\uC744 \uB3D9\uC791 \uC2DC\uD0A8\uB2E4
+                - Path=/first-service/**
+              # \uB2E8\uC77C \uC9C4\uC785\uC810\uC5D0\uC11C \uC81C\uACF5 \uB418\uB294 \uC124\uC815 \uAC12\uC744 \uD1B5\uD574 \uB2E4\uC591\uD55C filter \uCC98\uB9AC\uB97C \uD560 \uC218 \uC788\uB2E4.
+              filters:
+                # /first-service/health \uC694\uCCAD\uC744 /health\uB85C \uC7AC\uC791\uC131\uD558\uB294 \uD544\uD130
+                - RewritePath=/first-service/(?<segment>.*), /$\{segment}
+                # \uC694\uCCAD : 'first-request' \uD5E4\uB354\uC5D0 'first-request-value' \uAC12\uC744 \uCD94\uAC00\uD558\uB294 \uD544\uD130
+                - AddRequestHeader=first-request, first-request-value
+                # \uC751\uB2F5 : 'first-response' \uD5E4\uB354\uC5D0 'first-response-value' \uAC12\uC744 \uCD94\uAC00\uD558\uB294 \uD544\uD130
+                - AddResponseHeader=first-response, first-response-value
+            - id: 2nd-service
+              uri: lb://2ND-SERVICE
+              predicates:
+                - Path=/second-service/**
+              filters:
+                - RewritePath=/second-service/(?<segment>.*), /$\{segment}
+                - AddRequestHeader=second-request, second-request-value
+                - AddResponseHeader=second-response, second-response-value
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
