@@ -37,9 +37,15 @@ public class SecurityConfig {
                                 "/internal/notifications/**"
                         ).permitAll()
 
+
+
                         // 그 외 나머지도 일단 전부 허용
                         .anyRequest().permitAll()
+
+
                 );
+
+
 
         // ❗ jwtAuthentiationFilter, CustomUserDetailsService, ApiEndpoint 등은 여기서 전혀 사용하지 않음!
         return http.build();

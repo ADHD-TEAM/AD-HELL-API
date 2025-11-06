@@ -81,6 +81,10 @@ public class SecurityConfig {
 
                 /* SSE 테스트 */
 
+//                // 테스트용: 문의 관련 API 전부 허용
+//                auth.requestMatchers("/api/inquiries/**").permitAll();
+
+
                 for(ApiEndpoint endpoint : ApiEndpoint.values()) {
                     if (endpoint.getRole() == null) {
                         // 회원가입, 로그인, 로그아웃

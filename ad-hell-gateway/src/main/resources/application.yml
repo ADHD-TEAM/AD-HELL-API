@@ -13,7 +13,9 @@ spring:
             - id: ad-hell-notification-service
               uri: lb://AD-HELL-NOTIFICATION-SERVICE
               predicates:
-                - Path=/api/users/*/notifications/**,/api/admin/notifications/**
+                - Path=/api/users/*/notifications/**,
+                      /api/admin/notifications/**,
+                      /api/notifications/**
               filters:
                 - name: CircuitBreaker
                   args:
