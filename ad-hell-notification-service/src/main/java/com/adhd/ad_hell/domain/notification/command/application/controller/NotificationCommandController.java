@@ -6,6 +6,7 @@ import com.adhd.ad_hell.domain.notification.command.application.dto.response.Not
 import com.adhd.ad_hell.domain.notification.command.application.dto.response.NotificationScheduleResponse;
 import com.adhd.ad_hell.domain.notification.command.application.dto.response.NotificationTemplateResponse;
 import com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandService;
+import com.adhd.ad_hell.security.NotificationUserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +14,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -41,8 +45,20 @@ public class NotificationCommandController {
     })
     @PatchMapping("/api/notifications/settings/push")
     public ResponseEntity<ApiResponse<Void>> updatePushSetting(
-            @Valid @RequestBody NotificationPushToggleRequest request
+            @Valid @RequestBody NotificationPushToggleRequest request,
+            @AuthenticationPrincipal NotificationUserPrincipal principal
     ) {
+        if (principal == null) {
+            throw new AccessDeniedException("인증 정보가 없습니다.");
+        }
+
+        Long authUserId = principal.getUserId();
+        Long targetUserId = request.getMemberId(); // 필드명이 다르면 여기를 맞춰주면 됨
+
+        if (!authUserId.equals(targetUserId)) {
+            throw new AccessDeniedException("다른 사용자의 푸시 설정은 변경할 수 없습니다.");
+        }
+
         commandService.updatePushSetting(request);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
@@ -68,8 +84,18 @@ public class NotificationCommandController {
     @PatchMapping("/api/users/{userId}/notifications/{notificationId}/read")
     public ResponseEntity<ApiResponse<Void>> markRead(
             @PathVariable Long userId,
-            @PathVariable Long notificationId
+            @PathVariable Long notificationId,
+            @AuthenticationPrincipal NotificationUserPrincipal principal
     ) {
+        if (principal == null) {
+            throw new AccessDeniedException("인증 정보가 없습니다.");
+        }
+
+        Long authUserId = principal.getUserId();
+        if (!authUserId.equals(userId)) {
+            throw new AccessDeniedException("다른 사용자의 알림은 읽음 처리할 수 없습니다.");
+        }
+
         commandService.markRead(userId, notificationId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
@@ -97,6 +123,7 @@ public class NotificationCommandController {
                     description = "템플릿이 존재하지 않음"
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/api/admin/notifications/{templateId}/send")
     public ResponseEntity<ApiResponse<NotificationDispatchResponse>> send(
             @PathVariable Long templateId,
@@ -124,6 +151,7 @@ public class NotificationCommandController {
                     description = "템플릿이 존재하지 않음"
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/api/admin/notifications/{templateId}/reserve")
     public ResponseEntity<ApiResponse<NotificationScheduleResponse>> reserve(
             @PathVariable Long templateId,
@@ -149,6 +177,7 @@ public class NotificationCommandController {
                     description = "요청 값 검증 실패"
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/api/admin/notifications/templates")
     public ResponseEntity<ApiResponse<NotificationTemplateResponse>> createTemplate(
             @Valid @RequestBody NotificationTemplateCreateRequest request
@@ -175,6 +204,7 @@ public class NotificationCommandController {
                     description = "템플릿이 존재하지 않음"
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/api/admin/notifications/templates/{templateId}")
     public ResponseEntity<ApiResponse<NotificationTemplateResponse>> updateTemplate(
             @PathVariable Long templateId,
@@ -198,6 +228,7 @@ public class NotificationCommandController {
                     description = "템플릿이 존재하지 않음"
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/api/admin/notifications/templates/{templateId}")
     public ResponseEntity<ApiResponse<Void>> deleteTemplate(
             @PathVariable Long templateId
