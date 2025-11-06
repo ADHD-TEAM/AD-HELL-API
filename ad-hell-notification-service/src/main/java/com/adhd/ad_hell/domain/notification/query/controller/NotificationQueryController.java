@@ -14,6 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.AccessDeniedException;
+import com.adhd.ad_hell.security.NotificationUserPrincipal;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,8 +42,18 @@ public class NotificationQueryController {
     public ResponseEntity<ApiResponse<NotificationPageResponse>> getUserNotifications(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(required = false) Integer size
+            @RequestParam(required = false) Integer size,
+            @AuthenticationPrincipal NotificationUserPrincipal principal
     ) {
+        if (principal == null) {
+            throw new AccessDeniedException("인증 정보가 없습니다.");
+        }
+
+        Long authUserId = principal.getUserId();
+        if (!userId.equals(authUserId)) {
+            throw new AccessDeniedException("다른 사용자의 알림은 조회할 수 없습니다.");
+        }
+
         var res = queryService.getUserNotifications(userId, page, size);
         return ResponseEntity.ok(ApiResponse.success(res));
     }
@@ -57,7 +70,19 @@ public class NotificationQueryController {
             )
     })
     @GetMapping("/api/users/{userId}/notifications/unread-count")
-    public ResponseEntity<ApiResponse<Long>> getUnreadCount(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<Long>> getUnreadCount(
+            @PathVariable Long userId,
+            @AuthenticationPrincipal NotificationUserPrincipal principal
+    ) {
+        if (principal == null) {
+            throw new AccessDeniedException("인증 정보가 없습니다.");
+        }
+
+        Long authUserId = principal.getUserId();
+        if (!userId.equals(authUserId)) {
+            throw new AccessDeniedException("다른 사용자의 알림은 조회할 수 없습니다.");
+        }
+
         long cnt = queryService.getUnreadCount(userId);
         return ResponseEntity.ok(ApiResponse.success(cnt));
     }

@@ -27,3 +27,6 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+jwt:
+  secret: Q8b83bmIq4KI2lvE+bViXYvo9SyODg1g0Q0dPyG9VNutj0GgBG8SxhWwL3oexDlWtq5uxFZs+k+NWXHYXKLjYg==

@@ -131,4 +131,35 @@ public class JwtTokenProvider {
         }
         return null;
     }
+
+
+    // 알림 검증용 메소드들
+    public String createAccessTokenWithUser(String loginId, Long userId, Role role) {
+        Date now = new Date();
+        Date expriyDate = new Date(now.getTime() + jwtProperties.getExpiration());
+
+        return Jwts.builder()
+                .subject(loginId)              // 그대로 loginId
+                .claim("userId", userId)       // 🟢 새로 추가
+                .claim("role", role.name())    // 문자열로
+                .issuedAt(now)
+                .expiration(expriyDate)
+                .signWith(secretKey, Jwts.SIG.HS512)
+                .compact();
+    }
+
+    public String createRefreshTokenWithUser(String loginId, Long userId, Role role) {
+        Date now = new Date();
+        Date expriyDate = new Date(now.getTime() + jwtProperties.getRefreshExpiration());
+
+        return Jwts.builder()
+                .subject(loginId)
+                .claim("userId", userId)
+                .claim("role", role.name())
+                .issuedAt(now)
+                .expiration(expriyDate)
+                .signWith(secretKey, Jwts.SIG.HS512)
+                .compact();
+    }
+
 }

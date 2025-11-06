@@ -1,53 +1,69 @@
 package com.adhd.ad_hell.config;
 
+import com.adhd.ad_hell.security.NotificationJwtAuthenticationFilter;
+import com.adhd.ad_hell.security.NotificationJwtTokenProvider;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final NotificationJwtTokenProvider tokenProvider;
 
     @Bean
     public SecurityFilterChain notificationSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // JWT 쓸 준비는 해두되, 당장은 단순 모드
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionManagement(s ->
+                        s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // Swagger / 문서
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-
-                        // 알림 관련 API들 전부 허용 (테스트용)
                         .requestMatchers(
-                                "/api/notifications/**",
-                                "/api/users/*/notifications/**",
-                                "/api/admin/notifications/**",
-                                "/internal/notifications/**"
+                                "/",
+                                "/index.html",
+                                "/sse-test.html",
+                                "/static/**",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/favicon.ico"
                         ).permitAll()
-
-
-
-                        // 그 외 나머지도 일단 전부 허용
-                        .anyRequest().permitAll()
-
-
+                        // 🔐 사용자 알림 관련은 인증 필수
+                        .requestMatchers("/api/users/*/notifications/**").authenticated()
+                        // 내부 호출은 일단 열어두기
+                        .requestMatchers("/internal/notifications/**").permitAll()
+                        // 관리자용 API
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(
+                        notificationJwtAuthenticationFilter(),
+                        UsernamePasswordAuthenticationFilter.class
                 );
 
-
-
-        // ❗ jwtAuthentiationFilter, CustomUserDetailsService, ApiEndpoint 등은 여기서 전혀 사용하지 않음!
         return http.build();
+    }
+
+    @Bean
+    public NotificationJwtAuthenticationFilter notificationJwtAuthenticationFilter() {
+        return new NotificationJwtAuthenticationFilter(tokenProvider);
     }
 }
