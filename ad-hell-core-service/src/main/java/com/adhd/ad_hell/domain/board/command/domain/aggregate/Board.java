@@ -1,10 +1,15 @@
 package com.adhd.ad_hell.domain.board.command.domain.aggregate;
 
 import com.adhd.ad_hell.common.BaseTimeEntity;
+import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.AdFile;
 import com.adhd.ad_hell.domain.category.command.domain.aggregate.Category;
 import com.adhd.ad_hell.domain.user.command.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @Entity
 @Table(name = "board")
@@ -30,17 +35,21 @@ public class Board extends BaseTimeEntity {
     private String status = "Y";
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private User writer;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "category_id", nullable = false)
+    @JoinColumn(name = "category_id", nullable = true)
     private Category category;
 
     @Builder.Default
     @Column(name = "view_count", nullable = false)
     private Long viewCount = 0L;
 
+    // 게시글-파일 연관관계 (AdFile 재사용)
+    @Builder.Default
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AdFile> files = new ArrayList<>();
 
     // --- 비즈니스 ---
     public void increaseViewCount() { this.viewCount = (viewCount == null ? 0L : viewCount) + 1; }
@@ -64,5 +73,31 @@ public class Board extends BaseTimeEntity {
                 .build();
     }
 
+    // 파일 추가 편의 메서드
+    public void addFile(AdFile file) {
+        this.files.add(file);
+        file.setBoard(this); // 양방향 연관관계 고정
+    }
 
+    // 전체 파일 제거
+    public void clearFiles() {
+        for (AdFile f : files) {
+            f.setBoard(null);
+        }
+        files.clear();
+    }
+
+    // storedName으로 하나 제거
+    public boolean removeFileByStoredName(String storedName) {
+        for (Iterator<AdFile> it = files.iterator(); it.hasNext();) {
+            AdFile f = it.next();
+            if (storedName.equals(f.getStoredName())) {
+                it.remove();
+                f.setBoard(null);
+                return true;
+            }
+        }
+        return false;
+    }
 }
+

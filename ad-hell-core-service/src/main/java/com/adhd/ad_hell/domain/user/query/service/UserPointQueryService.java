@@ -12,6 +12,7 @@ import com.adhd.ad_hell.exception.ErrorCode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class UserPointQueryService {
   private final PointHistoryMapper pointHistoryMapper;
   private final SecurityUtil securityUtil;
 
+  @Transactional(readOnly = true)
   public List<UserPointHistoryResponse> getMyPointHistory() {
     Long userId = securityUtil.getLoginUserInfo().getUserId();
 

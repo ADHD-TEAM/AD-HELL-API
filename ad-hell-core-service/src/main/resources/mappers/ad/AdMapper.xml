@@ -4,70 +4,92 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.adhd.ad_hell.domain.advertise.query.mapper.AdMapper">
 
-    <select id="selectAdById" resultType="com.adhd.ad_hell.domain.advertise.query.dto.response.AdDto">
+    <resultMap id="AdResultMap" type="com.adhd.ad_hell.domain.advertise.query.dto.response.AdDto">
+        <id property="adId" column="ad_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="title" column="title"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="bookmarkCount" column="bookmark_count"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+
+        <collection property="files"
+          ofType="com.adhd.ad_hell.domain.advertise.query.dto.response.AdFileDto">
+            <id property="fileId" column="file_id"/>
+            <result property="originFileName" column="origin_file_name"/>
+            <result property="storedName" column="stored_name"/>
+            <result property="fileType" column="file_type"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectAdById" resultMap="AdResultMap">
         SELECT
-        a.ad_id,
-        a.title,
-        a.view_count,
-        a.like_count,
-        a.bookmark_count,
-        a.comment_count,
-        a.created_at,
-        a.updated_at,
+                a.ad_id,
+                a.category_id,
+                c.name AS category_name,
+                a.title,
+                a.view_count,
+                a.like_count,
+                a.bookmark_count,
+                a.comment_count,
+                a.created_at,
+                a.updated_at,
 
-        b.user_id AS "user.user_id",
-        c.category_id AS "category.id",
-        c.name AS "category.name"
-
+                f.file_id,
+                f.origin_file_name,
+                f.stored_name,
+                f.file_type
         FROM ad a
-        JOIN user b ON a.user_id = b.user_id
-        JOIN category c ON a.category_id = c.category_id
-
+        JOIN category c ON a.category_id = c.id
+        LEFT JOIN ad_file f ON a.ad_id = f.ad_id
         WHERE a.ad_id = #{adId}
-        AND status = 'ACTIVATE'
+        AND a.status = 'ACTIVATE'
     </select>
 
-    <select id="selectAds"
-            resultType="com.adhd.ad_hell.domain.advertise.query.dto.response.AdDto">
+    <select id="selectAds" resultMap="AdResultMap">
         SELECT
-        a.ad_id,
-        a.title,
-        a.view_count,
-        a.like_count,
-        a.bookmark_count,
-        a.comment_count,
-        a.created_at,
-        a.updated_at,
+            a.ad_id,
+            a.category_id,
+            c.name AS category_name,
+            a.title,
+            a.view_count,
+            a.like_count,
+            a.bookmark_count,
+            a.comment_count,
+            a.created_at,
+            a.updated_at,
 
-        b.user_id AS "user.user_id",
-        c.category_id AS "category.id",
-        c.name AS "category.name"
-
+            f.file_id,
+            f.origin_file_name,
+            f.stored_name,
+            f.file_type
         FROM ad a
-        JOIN user b ON a.user_id = b.user_id
-        JOIN category c ON a.category_id = c.category_id
-
-        WHERE a.ad_id = #{adId}
-        AND status = 'ACTIVATE'
+        JOIN category c ON a.category_id = c.id
+        LEFT JOIN ad_file f ON a.ad_id = f.ad_id
+        WHERE a.status = 'ACTIVATE'
         <if test="categoryId != null">
-            AND a.category_id = #{ id }
+            AND a.category_id = #{categoryId}
         </if>
-        <if test="title != null">
-            AND a.title LIKE CONCAT('%', #{ title }, '%')
+        <if test="title != null and title != ''">
+            AND a.title LIKE CONCAT('%', #{title}, '%')
         </if>
         ORDER BY a.ad_id DESC
-        LIMIT #{ limit } OFFSET #{ offset }
+        LIMIT #{size} OFFSET #{offset};
     </select>
 
-    <select id="countAds" resultType="com.adhd.ad_hell.domain.advertise.query.dto.response.AdDto">
+
+    <select id="countAds" resultType="long">
         SELECT COUNT(*)
-        FROM ad a
-        WHERE status = 'USABLE'
-        <if test="adId != null">
-            AND a.ad_id = #{ adId }
+        FROM ad
+        WHERE status = 'ACTIVATE'
+        <if test="categoryId != null">
+            AND category_id = #{categoryId}
         </if>
-        <if test="adName != null">
-            AND a.ad_name LIKE CONCAT('%', #{ adName }, '%')
+        <if test="title != null and title != ''">
+            AND title LIKE CONCAT('%', #{title}, '%')
         </if>
     </select>
 

@@ -1,16 +1,16 @@
 package com.adhd.ad_hell.domain.board.command.application.dto.request;
 
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
+import lombok.*;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class BoardUpdateRequest {
 
-    private final String title;
-    private final String content;
-    private final String status;
-    private final Long categoryId;
+    private  String title;
+    private  String content;
+    private  String status;
+    private  Long categoryId;
 }

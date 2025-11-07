@@ -12,7 +12,4 @@ public interface AdFileRepository {
     void deleteById(Long fileId);
 
 
-    // 게시판 연동용
-    List<AdFile> findByBoardId(Long boardId);
-    void deleteByBoardId(Long boardId);
 }

@@ -3,28 +3,29 @@ package com.adhd.ad_hell.domain.board.command.application.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 
 @Getter
-@RequiredArgsConstructor
-
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class BoardCreateRequest {
 
     @NotBlank
-    private final String title;
+    private  String title;
 
     @NotBlank
-    private final String content;
+    private  String content;
+
+    private  Long writerId;
 
     @NotNull
-    private final Long writerId;
-
-    @NotNull
-    private final Long categoryId;
+    private  Long categoryId;
 
     @NotBlank
-    private final String status;
+    private  String status;
+
+    private  String imageUrl;
 
 }

@@ -11,16 +11,21 @@ import java.util.List;
 @Mapper
 public interface BoardMapper {
 
-        // 게시글 목록 조회 (검색 + 페이징 + 정렬)
-        List<BoardSummaryResponse> findAllBoards(@Param("request") BoardSearchRequest boardSearchRequest);
+    /** 게시글 목록 조회 (검색 + 페이징 + 정렬 + 파일 URL 포함) */
+    List<BoardSummaryResponse> findAllBoards(
+            @Param("request") BoardSearchRequest boardSearchRequest,
+            @Param("baseUrl") String baseUrl
+    );
 
-        // 목록 총 개수 (페이징 total 계산용)
-        long countAllBoards(@Param("request")BoardSearchRequest boardSearchRequest);
+    /** 게시글 총 개수 */
+    long countAllBoards(@Param("request") BoardSearchRequest boardSearchRequest);
 
-        // 상세 조회(조인 포함) — 필요 시
-        BoardDetailResponse findBoardDetailById(@Param("boardId")Long boardId);
+    /** 게시글 상세 조회 (파일 URL 포함) */
+    BoardDetailResponse findBoardDetailById(
+            @Param("boardId") Long boardId,
+            @Param("baseUrl") String baseUrl
+    );
 
-        // 조회수 증가
-        int increaseViewCount(@Param("boardId") Long boardId);
-
+    /** 조회수 증가 */
+    int increaseViewCount(@Param("boardId") Long boardId);
 }

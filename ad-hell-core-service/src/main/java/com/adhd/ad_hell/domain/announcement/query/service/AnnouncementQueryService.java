@@ -6,6 +6,8 @@ import com.adhd.ad_hell.domain.announcement.query.dto.response.AnnouncementDetai
 import com.adhd.ad_hell.domain.announcement.query.dto.response.AnnouncementListResponse;
 import com.adhd.ad_hell.domain.announcement.query.dto.response.AnnouncementSummaryResponse;
 import com.adhd.ad_hell.domain.announcement.query.mapper.AnnouncementMapper;
+import com.adhd.ad_hell.exception.BusinessException;
+import com.adhd.ad_hell.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +50,10 @@ public class AnnouncementQueryService {
 
     /** 공지사항 단건 상세 조회 */
     public AnnouncementDetailResponse getAnnouncementDetail(Long announcementId) {
-        return announcementMapper.findAnnouncementDetailById(announcementId);
+        AnnouncementDetailResponse dto = announcementMapper.findAnnouncementDetailById(announcementId);
+        if (dto == null) {
+            throw new BusinessException(ErrorCode.ANNOUNCEMENT_NOT_FOUND);
+        }
+        return dto;
     }
 }

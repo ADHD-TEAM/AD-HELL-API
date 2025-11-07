@@ -1,11 +1,9 @@
 package com.adhd.ad_hell.domain.board.command.domain.repository;
 
 import com.adhd.ad_hell.domain.board.command.domain.aggregate.Board;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
 public interface BoardRepository {
 
 

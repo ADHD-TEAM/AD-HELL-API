@@ -1,8 +1,6 @@
 package com.adhd.ad_hell.domain.user.query.controller;
 
 import com.adhd.ad_hell.common.dto.ApiResponse;
-import com.adhd.ad_hell.domain.user.command.dto.request.UserPointRequest;
-import com.adhd.ad_hell.domain.user.command.dto.response.UserPointResponse;
 import com.adhd.ad_hell.domain.user.query.dto.response.UserPointHistoryResponse;
 import com.adhd.ad_hell.domain.user.query.service.UserPointQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,8 +10,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

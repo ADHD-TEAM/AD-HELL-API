@@ -9,6 +9,9 @@ import com.adhd.ad_hell.domain.user.command.dto.response.UserDetailResponse;
 import com.adhd.ad_hell.domain.user.command.dto.response.UserIsAvailableResponse;
 import com.adhd.ad_hell.domain.user.command.service.UserCommandService;
 import com.adhd.ad_hell.domain.user.command.service.UserCommandServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
+@Tag(name = "User Command", description = "사용자 API")
 public class UserCommandController {
 
     private final UserCommandService userCommandService;
@@ -30,6 +34,16 @@ public class UserCommandController {
      * @param userIsAvailableRequest
      * @return
      */
+    @Operation(
+            summary = "사용할 수 있는 닉네임 확인",
+            description = "회원가입시, 닉네임 변경시 사용할 수 있는 닉네임인지 확인할 수 있음"
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공"
+            ),
+    })
     @GetMapping("/isAvailable")
     public ResponseEntity<ApiResponse<UserIsAvailableResponse>> isAvailable(
             @RequestParam UserIsAvailableRequest userIsAvailableRequest) {
@@ -45,6 +59,16 @@ public class UserCommandController {
      *  마이페이지
      * @return
      */
+    @Operation(
+            summary = "마이페이지",
+            description = "사용자는 마이페이지를 조회할 수 있다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공"
+            ),
+    })
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserDetailResponse>> getUserDetail(
             @AuthenticationPrincipal CustomUserDetails userDetails
@@ -79,7 +103,7 @@ public class UserCommandController {
      * @param userDetails
      * @return
      */
-    @PatchMapping("/withdraw")
+    @DeleteMapping("/withdraw")
     public ResponseEntity<ApiResponse<Void>> withdrawByUserInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {

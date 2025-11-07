@@ -1,12 +1,13 @@
 package com.adhd.ad_hell.domain.announcement.command.application.service;
 
+import com.adhd.ad_hell.common.util.SecurityUtil;
 import com.adhd.ad_hell.domain.announcement.command.application.dto.request.AnnouncementCreateRequest;
 import com.adhd.ad_hell.domain.announcement.command.application.dto.request.AnnouncementUpdateRequest;
 import com.adhd.ad_hell.domain.announcement.command.application.dto.response.AnnouncementCommandResponse;
 import com.adhd.ad_hell.domain.announcement.command.domain.aggregate.Announcement;
 import com.adhd.ad_hell.domain.announcement.command.domain.repository.AnnouncementRepository;
 import com.adhd.ad_hell.domain.user.command.entity.User;
-import com.adhd.ad_hell.domain.user.command.repository.UserCommandRepository;
+import com.adhd.ad_hell.domain.user.query.service.provider.UserProvider;
 import com.adhd.ad_hell.exception.BusinessException;
 import com.adhd.ad_hell.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +27,16 @@ public class AnnouncementCommandService {
     // 객체가 사용할 의존 객체를 직접 생성하지 않고, 외부에서 주입 받는 것을 말함.
     // 클래스 내부에서 NEW로 직접 객체를 만들지 않고 스프링이 대신 만들어서 넣어줌.
     private final AnnouncementRepository announcementRepository; // 공지사항 저장소
-    private final UserCommandRepository userRepository;          // 작성자(User) 조회용 저장소
-
+    private final SecurityUtil securityUtil;
+    private final UserProvider userProvider;
 
     // 공지사항 등록
     public AnnouncementCommandResponse create(AnnouncementCreateRequest request) {
 
         // 작성자 정보 조회(writerId 기준)
         // 존재하지 않으면 USER_NOT_FOUND 예외 발생
-        User writer = userRepository.findById(request.getWriterId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
+        Long userId = securityUtil.getLoginUserInfo().getUserId();
+        User writer = userProvider.getUserById(userId);
         // 상태(status)가 null이면 기본값 'Y'로 설정
         String status = (request.getStatus() != null) ? request.getStatus() : "Y";
 
