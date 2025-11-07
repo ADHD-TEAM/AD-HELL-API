@@ -17,7 +17,6 @@ import com.adhd.ad_hell.exception.ErrorCode;
 import com.adhd.ad_hell.jwt.JwtTokenProvider;
 import com.adhd.ad_hell.mail.MailService;
 import com.adhd.ad_hell.mail.MailType;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;

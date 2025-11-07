@@ -11,7 +11,6 @@ import com.adhd.ad_hell.domain.reward.command.domain.aggregate.RewardStock;
 import com.adhd.ad_hell.domain.reward.command.domain.aggregate.RewardStockStatus;
 import com.adhd.ad_hell.domain.reward.command.domain.repository.RewardRepository;
 import com.adhd.ad_hell.domain.reward.command.domain.repository.RewardStockRepository;
-import com.adhd.ad_hell.domain.user.command.entity.User;
 import com.adhd.ad_hell.domain.user.query.dto.response.UserRewardInfo;
 import com.adhd.ad_hell.domain.user.query.service.provider.UserProvider;
 import com.adhd.ad_hell.exception.BusinessException;

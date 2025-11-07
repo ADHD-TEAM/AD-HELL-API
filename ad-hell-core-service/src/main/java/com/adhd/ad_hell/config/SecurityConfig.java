@@ -63,14 +63,16 @@ public class SecurityConfig {
                 // [A] SSE 테스트를 위한 예외 허용 (테스트용)
                 // 정적 리소스 & 테스트 페이지
                 auth.requestMatchers(
-                        "/",              // 루트
-                        "/index.html",
-                        "/sse-test.html", // 우리가 만들 테스트 페이지
-                        "/static/**",
-                        "/css/**",
-                        "/js/**",
-                        "/images/**",
-                        "/favicon.ico"
+                        "/",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/api/auth/**",          // 로그인/회원가입 등
+                        "/api/inquiries/**",
+                        "/api/ads/**",
+                        "/api/ad/**",
+                        "/api/ad_favorites/**",
+                        "/api/boards/**"
                 ).permitAll();
 
                 // SSE 구독 엔드포인트도 일단 모두 허용 (테스트용)
@@ -80,6 +82,10 @@ public class SecurityConfig {
                 ).permitAll();
 
                 /* SSE 테스트 */
+
+//                // 테스트용: 문의 관련 API 전부 허용
+//                auth.requestMatchers("/api/inquiries/**").permitAll();
+
 
                 for(ApiEndpoint endpoint : ApiEndpoint.values()) {
                     if (endpoint.getRole() == null) {

@@ -5,19 +5,16 @@ import com.adhd.ad_hell.common.BaseTimeEntity;
 import com.adhd.ad_hell.domain.auth.command.dto.request.ResetPasswordRequest;
 import com.adhd.ad_hell.domain.user.command.dto.request.AdminModifyRequest;
 import com.adhd.ad_hell.domain.user.command.dto.request.UserModifyRequest;
-import com.adhd.ad_hell.domain.user.command.dto.request.UserSignUpRequest;
 
 
 import com.adhd.ad_hell.domain.user.query.dto.UserDTO;
 import com.adhd.ad_hell.exception.BusinessException;
 import com.adhd.ad_hell.exception.ErrorCode;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 

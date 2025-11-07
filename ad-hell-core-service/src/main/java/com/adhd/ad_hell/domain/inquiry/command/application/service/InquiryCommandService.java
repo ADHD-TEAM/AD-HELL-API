@@ -8,14 +8,13 @@ import com.adhd.ad_hell.domain.inquiry.command.application.dto.request.InquiryAn
 
 import com.adhd.ad_hell.domain.inquiry.command.domain.repository.InquiryRepository;
 import com.adhd.ad_hell.domain.user.command.entity.User;
-import com.adhd.ad_hell.domain.user.command.repository.UserCommandRepository;
 import com.adhd.ad_hell.domain.user.query.service.provider.UserProvider;
 import com.adhd.ad_hell.exception.BusinessException;
-import com.adhd.ad_hell.exception.ErrorCode;
 import com.adhd.ad_hell.domain.inquiry.command.application.dto.request.InquiryCreateRequest;
 import com.adhd.ad_hell.domain.inquiry.command.domain.aggregate.Inquiry;
 
 
+import com.adhd.ad_hell.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
