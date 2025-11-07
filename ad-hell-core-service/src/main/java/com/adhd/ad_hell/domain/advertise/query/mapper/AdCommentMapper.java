@@ -1,7 +1,7 @@
-package com.adhd.ad_hell.domain.ad_comment.query.mapper;
+package com.adhd.ad_hell.domain.advertise.query.mapper;
 
-import com.adhd.ad_hell.domain.ad_comment.query.dto.request.AdCommentSearchRequest;
-import com.adhd.ad_hell.domain.ad_comment.query.dto.response.AdCommentDto;
+import com.adhd.ad_hell.domain.advertise.query.dto.request.AdCommentSearchRequest;
+import com.adhd.ad_hell.domain.advertise.query.dto.response.AdCommentDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

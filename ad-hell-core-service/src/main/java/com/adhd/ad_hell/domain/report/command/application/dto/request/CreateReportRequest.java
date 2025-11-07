@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class CreateReportRequest {
-  private final Long categoryId;
-  private final Long targetId;
-  private final String reasonDetail;
+  private Long categoryId;
+  private Long targetId;
+  private String reasonDetail;
 }

@@ -1,7 +1,6 @@
 package com.adhd.ad_hell.domain.user.command.dto.request;
 
 import com.adhd.ad_hell.domain.user.command.entity.Role;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -12,12 +11,10 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@Schema(description = "회원가입 요청 DTO")
 public class UserSignUpRequest {
 
     @NotBlank(message="아이디를 입력해주세요.")
     @Size(max=30, message = "아이디 최대 길이는 {max}글자입니다.")
-    @Schema(description = "로그인 아이디", example = "혜인")
     private String loginId;
 
     @NotBlank(message = "비밀번호를 입력해주세요.")

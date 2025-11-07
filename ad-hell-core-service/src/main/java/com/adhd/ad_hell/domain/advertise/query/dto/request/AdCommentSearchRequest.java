@@ -1,4 +1,4 @@
-package com.adhd.ad_hell.domain.ad_comment.query.dto.request;
+package com.adhd.ad_hell.domain.advertise.query.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;

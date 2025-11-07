@@ -36,18 +36,20 @@ public class CategoryQueryService {
 //    all.stream().collect(Collectors.toMap(CategoryTreeResponse::getId, c -> c));
 
     Map<Long, CategoryTreeResponse> map = new HashMap<>();
-    for (CategoryTreeResponse category : all) {
-      map.put(category.getId(), category);
+    for (CategoryTreeResponse c : all) {
+      map.put(c.getId(), c);
     }
 
     List<CategoryTreeResponse> roots = new ArrayList<>();
-    for (CategoryTreeResponse category : all) {
-      if (category.getParentId() == null) {
-        roots.add(category);
+    for (CategoryTreeResponse c : all) {
+      if (c.getParentId() == null) {
+        roots.add(c);
       } else {
-        CategoryTreeResponse parent = map.get(category.getParentId());
+        CategoryTreeResponse parent = map.get(c.getParentId());
         if (parent != null) {
-          parent.getChildren().add(category);
+          parent.getChildren().add(c);
+        } else {
+          roots.add(c);
         }
       }
     }

@@ -1,4 +1,4 @@
-package com.adhd.ad_hell.domain.ad_comment.query.dto.response;
+package com.adhd.ad_hell.domain.advertise.query.dto.response;
 
 import com.adhd.ad_hell.common.dto.Pagination;
 import lombok.Builder;

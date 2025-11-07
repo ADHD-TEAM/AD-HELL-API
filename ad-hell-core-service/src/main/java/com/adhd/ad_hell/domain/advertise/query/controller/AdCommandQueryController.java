@@ -1,10 +1,12 @@
-package com.adhd.ad_hell.domain.ad_comment.query.controller;
+package com.adhd.ad_hell.domain.advertise.query.controller;
 
 import com.adhd.ad_hell.common.dto.ApiResponse;
-import com.adhd.ad_hell.domain.ad_comment.query.dto.request.AdCommentSearchRequest;
-import com.adhd.ad_hell.domain.ad_comment.query.dto.response.AdCommentDetailResponse;
-import com.adhd.ad_hell.domain.ad_comment.query.dto.response.AdCommentListResponse;
-import com.adhd.ad_hell.domain.ad_comment.query.service.AdCommentQueryService;
+import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.AdComment;
+import com.adhd.ad_hell.domain.advertise.query.dto.request.AdCommentSearchRequest;
+import com.adhd.ad_hell.domain.advertise.query.dto.request.AdSearchRequest;
+import com.adhd.ad_hell.domain.advertise.query.dto.response.AdCommentDetailResponse;
+import com.adhd.ad_hell.domain.advertise.query.dto.response.AdCommentListResponse;
+import com.adhd.ad_hell.domain.advertise.query.service.AdCommentQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

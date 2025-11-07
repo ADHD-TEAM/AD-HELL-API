@@ -1,8 +1,7 @@
-package com.adhd.ad_hell.domain.ad_comment.command.application.service;
+package com.adhd.ad_hell.domain.advertise.command.application.service;
 
-import com.adhd.ad_hell.domain.ad_comment.command.application.dto.request.AdCommentCreateRequest;
-import com.adhd.ad_hell.domain.ad_comment.command.application.dto.request.AdCommentUpdateRequest;
-
+import com.adhd.ad_hell.domain.advertise.command.application.dto.request.AdCommentCreateRequest;
+import com.adhd.ad_hell.domain.advertise.command.application.dto.request.AdCommentUpdateRequest;
 import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.AdComment;
 import com.adhd.ad_hell.domain.advertise.command.domain.repository.AdCommentRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,7 +17,7 @@ public class AdCommentCommandService {
 
     /* 광고 댓글 등록 */
     @Transactional
-    public void createAdComment(AdCommentCreateRequest req) {
+    public Long createAdComment(AdCommentCreateRequest req) {
         AdComment newComment = AdComment.builder()
                 .userId(req.getUserId())
                 .adId(req.getAdId())
@@ -26,6 +25,7 @@ public class AdCommentCommandService {
                 .build();
 
         AdComment saved = adCommentRepository.save(newComment);
+        return saved.getAdCommentId();
     }
 
 

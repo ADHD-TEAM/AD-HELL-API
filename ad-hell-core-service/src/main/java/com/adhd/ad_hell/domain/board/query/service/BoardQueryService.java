@@ -9,7 +9,6 @@ import com.adhd.ad_hell.domain.board.query.mapper.BoardMapper;
 import com.adhd.ad_hell.exception.BusinessException;
 import com.adhd.ad_hell.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +22,15 @@ public class BoardQueryService {
 
     private final BoardMapper boardMapper;
 
-    @Value("${file.base-url}")
-    private String fileBaseUrl; // 예: http://localhost:8080/api/files/
+    /** 게시글 상세 조회 */
+    public BoardDetailResponse getBoard(Long boardId) {
+        return Optional.ofNullable(boardMapper.findBoardDetailById(boardId))
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+    }
 
-    /** 게시글 목록 조회 (검색 + 페이징 + 정렬 + 파일 URL 포함) */
+    /** 게시글 목록 조회 (검색 + 페이징 + 정렬) */
     public BoardListResponse getBoards(BoardSearchRequest request) {
-        List<BoardSummaryResponse> boards = boardMapper.findAllBoards(request, fileBaseUrl);
+        List<BoardSummaryResponse> boards = boardMapper.findAllBoards(request);
         long totalItems = boardMapper.countAllBoards(request);
 
         int page = request.getPage();
@@ -42,15 +44,19 @@ public class BoardQueryService {
                         .totalItems(totalItems)
                         .build())
                 .build();
+
     }
 
-    /** 게시글 상세 조회 (조회수 증가 O, 파일 URL 포함) */
-    @Transactional
+    @Transactional // 조회수 증가이므로 readOnly=false
     public BoardDetailResponse getBoardAndIncreaseViewCount(Long boardId) {
+        // 1) 먼저 조회수 증가 (영향받은 행이 0이면 존재하지 않는 게시글)
         int updated = boardMapper.increaseViewCount(boardId);
-        if (updated == 0) throw new BusinessException(ErrorCode.BOARD_NOT_FOUND);
+        if (updated == 0) {
+            throw new BusinessException(ErrorCode.BOARD_NOT_FOUND);
+        }
 
-        return Optional.ofNullable(boardMapper.findBoardDetailById(boardId, fileBaseUrl))
+        // 2) 증가된 상태로 상세 조회 반환
+        return Optional.ofNullable(boardMapper.findBoardDetailById(boardId))
                 .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
     }
 }

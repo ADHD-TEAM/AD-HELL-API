@@ -1,11 +1,11 @@
-package com.adhd.ad_hell.domain.ad_comment.query.service;
+package com.adhd.ad_hell.domain.advertise.query.service;
 
 import com.adhd.ad_hell.common.dto.Pagination;
-import com.adhd.ad_hell.domain.ad_comment.query.dto.request.AdCommentSearchRequest;
-import com.adhd.ad_hell.domain.ad_comment.query.dto.response.AdCommentDetailResponse;
-import com.adhd.ad_hell.domain.ad_comment.query.dto.response.AdCommentDto;
-import com.adhd.ad_hell.domain.ad_comment.query.dto.response.AdCommentListResponse;
-import com.adhd.ad_hell.domain.ad_comment.query.mapper.AdCommentMapper;
+import com.adhd.ad_hell.domain.advertise.query.dto.request.AdCommentSearchRequest;
+import com.adhd.ad_hell.domain.advertise.query.dto.response.AdCommentDetailResponse;
+import com.adhd.ad_hell.domain.advertise.query.dto.response.AdCommentDto;
+import com.adhd.ad_hell.domain.advertise.query.dto.response.AdCommentListResponse;
+import com.adhd.ad_hell.domain.advertise.query.mapper.AdCommentMapper;
 import com.adhd.ad_hell.exception.BusinessException;
 import com.adhd.ad_hell.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
