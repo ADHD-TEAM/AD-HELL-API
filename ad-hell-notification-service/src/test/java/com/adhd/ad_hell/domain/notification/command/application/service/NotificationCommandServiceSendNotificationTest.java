@@ -370,4 +370,74 @@ class NotificationCommandServiceSendNotificationTest {
         assertEquals("{{name}}님, 공지입니다", n.getNotificationTitle());
         assertEquals("안녕하세요 {{name}}님", n.getNotificationBody());
     }
+
+    @Test
+    @DisplayName("템플릿 제목이 null 이면 mergeVariables 에서 그대로 null 반환")
+    void sendNotificationWithNullTitle() {
+        Long templateId = 1L;
+
+        NotificationTemplate template = NotificationTemplate.builder()
+                .templateKind(NotificationTemplateKind.NORMAL)
+                .templateTitle(null) // ★ 여기
+                .templateBody("본문 {{name}}")
+                .deletedYn(YnType.no())
+                .build();
+
+        when(templateRepo.findById(templateId)).thenReturn(Optional.of(template));
+        when(pushPref.findAllEnabled()).thenReturn(Set.of(1L));
+
+        when(notificationRepo.saveAll(anyList()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        NotificationSendRequest req = NotificationSendRequest.builder()
+                .targetType(NotificationSendRequest.TargetType.PUSH_ENABLED)
+                .variables(Map.of("name", "홍길동"))
+                .build();
+
+        TransactionSynchronizationManager.initSynchronization();
+        try {
+            sut.sendNotification(templateId, req);
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        // 여기서 saveAll captor 써서 title 이 null 인지 확인하면 됨
+    }
+
+    @Test
+    @DisplayName("variables 가 비어 있으면 mergeVariables 에서 원본 문자열 그대로 사용한다")
+    void sendNotificationVariablesEmpty() {
+        Long templateId = 1L;
+
+        NotificationTemplate template = NotificationTemplate.builder()
+                .templateKind(NotificationTemplateKind.NORMAL)
+                .templateTitle("{{name}}님, 공지입니다")
+                .templateBody("안녕하세요 {{name}}님")
+                .deletedYn(YnType.no())
+                .build();
+
+        when(templateRepo.findById(templateId)).thenReturn(Optional.of(template));
+        when(pushPref.findAllEnabled()).thenReturn(Set.of(1L));
+
+        ArgumentCaptor<List<Notification>> captor = ArgumentCaptor.forClass(List.class);
+        when(notificationRepo.saveAll(captor.capture()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        NotificationSendRequest req = NotificationSendRequest.builder()
+                .targetType(NotificationSendRequest.TargetType.PUSH_ENABLED)
+                .variables(Collections.emptyMap()) // ★ 여기
+                .build();
+
+        TransactionSynchronizationManager.initSynchronization();
+        try {
+            sut.sendNotification(templateId, req);
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        Notification saved = captor.getValue().get(0);
+        // 치환 안 되고 원본 그대로 가는지 확인
+        assertEquals("{{name}}님, 공지입니다", saved.getNotificationTitle());
+    }
+
 }

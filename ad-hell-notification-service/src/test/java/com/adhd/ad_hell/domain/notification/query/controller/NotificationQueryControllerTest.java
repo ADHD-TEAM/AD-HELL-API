@@ -8,6 +8,7 @@ import com.adhd.ad_hell.domain.notification.query.dto.response.NotificationSumma
 import com.adhd.ad_hell.domain.notification.query.dto.response.NotificationTemplatePageResponse;
 import com.adhd.ad_hell.domain.notification.query.dto.response.NotificationTemplateSummaryResponse;
 import com.adhd.ad_hell.domain.notification.query.service.NotificationQueryService;
+import com.adhd.ad_hell.security.NotificationUserPrincipal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -28,7 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(NotificationQueryController.class)
-@AutoConfigureMockMvc(addFilters = false) // 테스트용 Security 필터 끄기
+@AutoConfigureMockMvc(addFilters = false) // JWT 필터 등은 끄고, SecurityContext만 수동으로 세팅
 class NotificationQueryControllerTest {
 
     @Autowired
@@ -42,7 +46,7 @@ class NotificationQueryControllerTest {
     NotificationSseEmitters emitters;
 
     @Test
-    @DisplayName("GET /api/users/{userId}/notifications 호출 시 알림 목록과 페이징 정보가 ApiResponse 로 감싸져 반환된다")
+    @DisplayName("GET /api/users/{userId}/notifications - 본인 요청 시 알림 목록과 페이징 정보가 ApiResponse 로 반환된다")
     void getUserNotificationsSuccess() throws Exception {
         // given
         Long userId = 100L;
@@ -76,33 +80,38 @@ class NotificationQueryControllerTest {
                 .pagination(pagination)
                 .build();
 
-        // page, size 값까지 명확히 검증하기 위해 eq(...) 사용
         given(queryService.getUserNotifications(eq(userId), eq(page), eq(size)))
                 .willReturn(pageResponse);
 
-        // when & then
-        mockMvc.perform(get("/api/users/{userId}/notifications", userId)
-                        .param("page", String.valueOf(page))
-                        .param("size", String.valueOf(size))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                // ApiResponse<T> 의 data 안에 NotificationPageResponse 가 들어간다고 가정
-                .andExpect(jsonPath("$.data.notifications[0].notificationId").value(1L))
-                .andExpect(jsonPath("$.data.notifications[0].notificationTitle").value("알림1"))
-                .andExpect(jsonPath("$.data.notifications[0].read").value(false))
-                .andExpect(jsonPath("$.data.notifications[1].notificationId").value(2L))
-                .andExpect(jsonPath("$.data.notifications[1].read").value(true))
-                .andExpect(jsonPath("$.data.pagination.currentPage").value(0))
-                .andExpect(jsonPath("$.data.pagination.totalPages").value(1))
-                .andExpect(jsonPath("$.data.pagination.totalItems").value(2));
+        // 본인 인증 세팅
+        setAuth(userAuth(userId));
 
-        // 서비스가 기대한 인자로 1번 호출됐는지도 확인
-        then(queryService).should()
-                .getUserNotifications(eq(userId), eq(page), eq(size));
+        try {
+            // when & then
+            mockMvc.perform(get("/api/users/{userId}/notifications", userId)
+                            .param("page", String.valueOf(page))
+                            .param("size", String.valueOf(size))
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    // ApiResponse<T> 의 data 안에 NotificationPageResponse 가 들어간다고 가정
+                    .andExpect(jsonPath("$.data.notifications[0].notificationId").value(1L))
+                    .andExpect(jsonPath("$.data.notifications[0].notificationTitle").value("알림1"))
+                    .andExpect(jsonPath("$.data.notifications[0].read").value(false))
+                    .andExpect(jsonPath("$.data.notifications[1].notificationId").value(2L))
+                    .andExpect(jsonPath("$.data.notifications[1].read").value(true))
+                    .andExpect(jsonPath("$.data.pagination.currentPage").value(0))
+                    .andExpect(jsonPath("$.data.pagination.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.pagination.totalItems").value(2));
+
+            then(queryService).should()
+                    .getUserNotifications(eq(userId), eq(page), eq(size));
+        } finally {
+            clearAuth();
+        }
     }
 
     @Test
-    @DisplayName("GET /api/users/{userId}/notifications/unread-count 호출 시 미읽음 카운트가 ApiResponse 로 감싸져 반환된다")
+    @DisplayName("GET /api/users/{userId}/notifications/unread-count - 본인 요청 시 미읽음 카운트가 ApiResponse 로 반환된다")
     void getUnreadCountSuccess() throws Exception {
         // given
         Long userId = 200L;
@@ -111,35 +120,48 @@ class NotificationQueryControllerTest {
         given(queryService.getUnreadCount(userId))
                 .willReturn(unread);
 
-        // when & then
-        mockMvc.perform(get("/api/users/{userId}/notifications/unread-count", userId)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                // ApiResponse<Long> 의 data 에 숫자만 들어간다고 가정
-                .andExpect(jsonPath("$.data").value((int) unread)); // long -> int 캐스팅 주의
+        // 본인 인증 세팅
+        setAuth(userAuth(userId));
+
+        try {
+            // when & then
+            mockMvc.perform(get("/api/users/{userId}/notifications/unread-count", userId)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    // ApiResponse<Long> 의 data 에 숫자만 들어간다고 가정
+                    .andExpect(jsonPath("$.data").value((int) unread)); // long -> int 캐스팅
+        } finally {
+            clearAuth();
+        }
     }
 
     @Test
-    @DisplayName("GET /api/users/{userId}/notifications/stream 호출 시 SseEmitter 를 반환하고 emitters.add(userId)가 호출된다")
+    @DisplayName("GET /api/users/{userId}/notifications/stream - SSE 구독 요청 시 SseEmitter 반환 및 emitters.add(userId) 호출")
     void stream_success() throws Exception {
         // given
         Long userId = 300L;
         SseEmitter emitter = new SseEmitter();
+
         given(emitters.add(userId)).willReturn(emitter);
 
-        // when & then
-        mockMvc.perform(get("/api/users/{userId}/notifications/stream", userId)
-                        .accept(MediaType.TEXT_EVENT_STREAM))
-                .andExpect(status().isOk())
-                // SseEmitter 는 비동기 처리이므로 asyncStarted 여부를 확인
-                .andExpect(request().asyncStarted());
+        // (현재 stream() 에는 인증 체크가 없지만, 나중 확장을 고려해서 본인 인증을 넣어도 됨)
+        setAuth(userAuth(userId));
 
-        // 내부적으로 emitters.add(userId)가 한 번 호출됐는지 검증
-        then(emitters).should().add(userId);
+        try {
+            mockMvc.perform(get("/api/users/{userId}/notifications/stream", userId)
+                            .accept(MediaType.TEXT_EVENT_STREAM))
+                    .andExpect(status().isOk())
+                    // SseEmitter 는 비동기 처리이므로 asyncStarted 여부를 확인
+                    .andExpect(request().asyncStarted());
+
+            then(emitters).should().add(userId);
+        } finally {
+            clearAuth();
+        }
     }
 
     @Test
-    @DisplayName("GET /api/admin/notifications/templates 호출 시 템플릿 목록과 페이징 정보가 ApiResponse 로 감싸져 반환된다")
+    @DisplayName("GET /api/admin/notifications/templates - ADMIN 권한으로 템플릿 목록/검색 시 ApiResponse 로 반환된다")
     void getTemplatesSuccess() throws Exception {
         // given
         String keyword = "공지";
@@ -168,24 +190,63 @@ class NotificationQueryControllerTest {
         given(queryService.getTemplates(eq(keyword), eq(page), eq(size)))
                 .willReturn(pageResponse);
 
-        // when & then
-        mockMvc.perform(get("/api/admin/notifications/templates")
-                        .param("keyword", keyword)
-                        .param("page", String.valueOf(page))
-                        .param("size", String.valueOf(size))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                // data.templates[0] 내용 검증
-                .andExpect(jsonPath("$.data.templates[0].templateId").value(1L))
-                .andExpect(jsonPath("$.data.templates[0].templateKind").value("NORMAL"))
-                .andExpect(jsonPath("$.data.templates[0].templateTitle").value("공지 템플릿"))
-                .andExpect(jsonPath("$.data.templates[0].templateBody").value("내용입니다"))
-                // pagination 검증
-                .andExpect(jsonPath("$.data.pagination.currentPage").value(page))
-                .andExpect(jsonPath("$.data.pagination.totalPages").value(1))
-                .andExpect(jsonPath("$.data.pagination.totalItems").value(1));
+        // ADMIN 인증 세팅 (@PreAuthorize("hasRole('ADMIN')") 대응)
+        setAuth(adminAuth());
 
-        then(queryService).should()
-                .getTemplates(eq(keyword), eq(page), eq(size));
+        try {
+            // when & then
+            mockMvc.perform(get("/api/admin/notifications/templates")
+                            .param("keyword", keyword)
+                            .param("page", String.valueOf(page))
+                            .param("size", String.valueOf(size))
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    // data.templates[0] 내용 검증
+                    .andExpect(jsonPath("$.data.templates[0].templateId").value(1L))
+                    .andExpect(jsonPath("$.data.templates[0].templateKind").value("NORMAL"))
+                    .andExpect(jsonPath("$.data.templates[0].templateTitle").value("공지 템플릿"))
+                    .andExpect(jsonPath("$.data.templates[0].templateBody").value("내용입니다"))
+                    // pagination 검증
+                    .andExpect(jsonPath("$.data.pagination.currentPage").value(page))
+                    .andExpect(jsonPath("$.data.pagination.totalPages").value(1))
+                    .andExpect(jsonPath("$.data.pagination.totalItems").value(1));
+
+            then(queryService).should()
+                    .getTemplates(eq(keyword), eq(page), eq(size));
+        } finally {
+            clearAuth();
+        }
+    }
+
+    // ===== SecurityContext 헬퍼 =====
+
+    private void setAuth(UsernamePasswordAuthenticationToken auth) {
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(auth);
+        SecurityContextHolder.setContext(context);
+    }
+
+    private void clearAuth() {
+        SecurityContextHolder.clearContext();
+    }
+
+    private UsernamePasswordAuthenticationToken userAuth(Long userId) {
+        NotificationUserPrincipal principal =
+                new NotificationUserPrincipal(userId, "user" + userId, "USER");
+        return new UsernamePasswordAuthenticationToken(
+                principal,
+                null,
+                principal.getAuthorities()
+        );
+    }
+
+    private UsernamePasswordAuthenticationToken adminAuth() {
+        NotificationUserPrincipal principal =
+                new NotificationUserPrincipal(1L, "adminUser", "ADMIN");
+        return new UsernamePasswordAuthenticationToken(
+                principal,
+                null,
+                principal.getAuthorities()
+        );
     }
 }

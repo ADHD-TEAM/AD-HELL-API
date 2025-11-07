@@ -116,4 +116,47 @@ class NotificationQueryServiceGetUserNotificationsTest {
                 .countByUserIdAndReadYn(userId, YnType.N);
         verifyNoMoreInteractions(notificationRepo);
     }
+
+    @Test
+    @DisplayName("size 가 0 이하이면 DEFAULT_PAGE_SIZE(10)을 사용한다")
+    void getUserNotificationsSizeZeroUsesDefault() {
+        // given
+        Long userId = 100L;
+        int page = 0;
+        Integer size = 0;   // 0 또는 -1 같은 값
+
+        int expectedSize = 10;
+        int expectedOffset = 0;
+
+        NotificationSummaryResponse r1 = NotificationSummaryResponse.builder()
+                .notificationId(1L)
+                .notificationTitle("알림1")
+                .notificationBody("내용1")
+                .read(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        List<NotificationSummaryResponse> summaries = List.of(r1);
+        long totalItems = 1L;
+
+        when(mapper.selectUserNotifications(eq(userId), eq(expectedOffset), eq(expectedSize)))
+                .thenReturn(summaries);
+        when(mapper.countUserNotifications(eq(userId)))
+                .thenReturn(totalItems);
+
+        // when
+        NotificationPageResponse response = sut.getUserNotifications(userId, page, size);
+
+        // then
+        verify(mapper).selectUserNotifications(eq(userId), eq(expectedOffset), eq(expectedSize));
+        verify(mapper).countUserNotifications(eq(userId));
+
+        // pageSize가 10으로 들어갔는지 → mapper 호출로 검증
+        Pagination p = response.getPagination();
+        assertEquals(0, p.getCurrentPage());
+        assertEquals(1, p.getTotalPages());
+        assertEquals(totalItems, p.getTotalItems());
+    }
+
+
 }
