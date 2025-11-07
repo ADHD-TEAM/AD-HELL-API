@@ -2,7 +2,6 @@ package com.adhd.ad_hell.config;
 
 import com.adhd.ad_hell.security.NotificationJwtAuthenticationFilter;
 import com.adhd.ad_hell.security.NotificationJwtTokenProvider;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,11 +30,14 @@ public class SecurityConfig {
                         s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        // Swagger / 문서
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+
+                        // 정적 리소스, sse-test.html
                         .requestMatchers(
                                 "/",
                                 "/index.html",
@@ -46,12 +48,20 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/favicon.ico"
                         ).permitAll()
-                        // 🔐 사용자 알림 관련은 인증 필수
+
+                        // 🔓 개발용: SSE 스트림 엔드포인트는 토큰 없이 허용
+                        .requestMatchers("/api/users/*/notifications/stream").permitAll()
+
+                        // 🔐 그 외 사용자 알림 관련 API 는 인증 필수
                         .requestMatchers("/api/users/*/notifications/**").authenticated()
-                        // 내부 호출은 일단 열어두기
+
+                        // 내부 호출은 열어둠
                         .requestMatchers("/internal/notifications/**").permitAll()
+
                         // 관리자용 API
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // 나머지는 전부 인증 필요
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
