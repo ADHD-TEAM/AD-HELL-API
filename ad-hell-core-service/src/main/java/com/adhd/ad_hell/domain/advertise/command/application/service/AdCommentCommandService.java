@@ -2,8 +2,9 @@ package com.adhd.ad_hell.domain.ad_comment.command.application.service;
 
 import com.adhd.ad_hell.domain.ad_comment.command.application.dto.request.AdCommentCreateRequest;
 import com.adhd.ad_hell.domain.ad_comment.command.application.dto.request.AdCommentUpdateRequest;
-import com.adhd.ad_hell.domain.ad_comment.command.domain.aggregate.AdComment;
-import com.adhd.ad_hell.domain.ad_comment.command.domain.repository.AdCommentRepository;
+
+import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.AdComment;
+import com.adhd.ad_hell.domain.advertise.command.domain.repository.AdCommentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

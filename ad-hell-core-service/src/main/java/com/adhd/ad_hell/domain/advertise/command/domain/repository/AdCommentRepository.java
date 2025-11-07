@@ -1,6 +1,6 @@
-package com.adhd.ad_hell.domain.ad_comment.command.domain.repository;
+package com.adhd.ad_hell.domain.advertise.command.domain.repository;
 
-import com.adhd.ad_hell.domain.ad_comment.command.domain.aggregate.AdComment;
+import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.AdComment;
 
 import java.util.Optional;
 
