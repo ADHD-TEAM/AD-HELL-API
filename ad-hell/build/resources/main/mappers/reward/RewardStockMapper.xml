@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adhd.ad_hell.domain.reward.query.mapper.RewardStockMapper">
+  <select id="findRewardStocks"
+    resultType="com.adhd.ad_hell.domain.reward.query.dto.response.RewardStockResponse">
+    SELECT
+          rs.pin_number,
+          rs.expired_at,
+          rs.status
+    FROM reward_stock rs
+    WHERE rs.reward_id = #{rewardId}
+  </select>
+</mapper>

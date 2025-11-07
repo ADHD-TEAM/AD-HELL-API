@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.adhd.ad_hell.domain.notification.query.mapper.NotificationMapper">
+
+    <!-- 알림 목록 -->
+    <resultMap id="NotificationSummaryResultMap"
+               type="com.adhd.ad_hell.domain.notification.query.dto.response.NotificationSummaryResponse">
+        <id property="notificationId" column="notification_id"/>
+        <result property="notificationTitle" column="notification_title"/>
+        <result property="notificationBody" column="notification_body"/>
+        <result property="read" column="read"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="selectUserNotifications"
+            resultMap="NotificationSummaryResultMap">
+        SELECT
+            n.notification_id,
+            n.notification_title,
+            n.notification_body,
+            CASE WHEN n.is_read = 'Y' THEN TRUE ELSE FALSE END AS is_read_flag,
+            n.created_at
+        FROM notification n
+        WHERE n.user_id = #{userId}
+        ORDER BY n.created_at DESC
+            LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countUserNotifications"
+            resultType="long">
+        SELECT COUNT(*)
+        FROM notification n
+        WHERE n.user_id = #{userId}
+    </select>
+
+    <!-- 템플릿 목록 -->
+    <resultMap id="NotificationTemplateSummaryResultMap"
+               type="com.adhd.ad_hell.domain.notification.query.dto.response.NotificationTemplateSummaryResponse">
+        <id property="templateId" column="template_id"/>
+        <result property="templateKind" column="template_kind"/>
+        <result property="templateTitle" column="template_title"/>
+        <result property="templateBody" column="template_body"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="selectTemplates"
+            resultMap="NotificationTemplateSummaryResultMap">
+        SELECT
+        t.template_id,
+        t.template_kind,
+        t.template_title,
+        t.template_body,
+        t.created_at
+        FROM notification_template t
+        WHERE t.is_deleted = 'N'
+        <if test="keyword != null and keyword != ''">
+            AND LOWER(t.template_title) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+        </if>
+        ORDER BY t.created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countTemplates"
+            resultType="long">
+        SELECT COUNT(*)
+        FROM notification_template t
+        WHERE t.is_deleted = 'N'
+        <if test="keyword != null and keyword != ''">
+            AND LOWER(t.template_title) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+        </if>
+    </select>
+
+</mapper>

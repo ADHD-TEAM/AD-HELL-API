@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adhd.ad_hell.domain.advertise.query.mapper.AdMapper">
+
+    <resultMap id="AdResultMap" type="com.adhd.ad_hell.domain.advertise.query.dto.response.AdDto">
+        <id property="adId" column="ad_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="title" column="title"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="bookmarkCount" column="bookmark_count"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+
+        <collection property="files"
+          ofType="com.adhd.ad_hell.domain.advertise.query.dto.response.AdFileDto">
+            <id property="fileId" column="file_id"/>
+            <result property="originFileName" column="origin_file_name"/>
+            <result property="storedName" column="stored_name"/>
+            <result property="fileType" column="file_type"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectAdById" resultMap="AdResultMap">
+        SELECT
+                a.ad_id,
+                a.category_id,
+                c.name AS category_name,
+                a.title,
+                a.view_count,
+                a.like_count,
+                a.bookmark_count,
+                a.comment_count,
+                a.created_at,
+                a.updated_at,
+
+                f.file_id,
+                f.origin_file_name,
+                f.stored_name,
+                f.file_type
+        FROM ad a
+        JOIN category c ON a.category_id = c.id
+        LEFT JOIN ad_file f ON a.ad_id = f.ad_id
+        WHERE a.ad_id = #{adId}
+        AND a.status = 'ACTIVATE'
+    </select>
+
+    <select id="selectAds" resultMap="AdResultMap">
+        SELECT
+            a.ad_id,
+            a.category_id,
+            c.name AS category_name,
+            a.title,
+            a.view_count,
+            a.like_count,
+            a.bookmark_count,
+            a.comment_count,
+            a.created_at,
+            a.updated_at,
+
+            f.file_id,
+            f.origin_file_name,
+            f.stored_name,
+            f.file_type
+        FROM ad a
+        JOIN category c ON a.category_id = c.id
+        LEFT JOIN ad_file f ON a.ad_id = f.ad_id
+        WHERE a.status = 'ACTIVATE'
+        <if test="categoryId != null">
+            AND a.category_id = #{categoryId}
+        </if>
+        <if test="title != null and title != ''">
+            AND a.title LIKE CONCAT('%', #{title}, '%')
+        </if>
+        ORDER BY a.ad_id DESC
+        LIMIT #{size} OFFSET #{offset};
+    </select>
+
+
+    <select id="countAds" resultType="long">
+        SELECT COUNT(*)
+        FROM ad
+        WHERE status = 'ACTIVATE'
+        <if test="categoryId != null">
+            AND category_id = #{categoryId}
+        </if>
+        <if test="title != null and title != ''">
+            AND title LIKE CONCAT('%', #{title}, '%')
+        </if>
+    </select>
+
+    <!-- 조회수 증가 -->
+    <update id="incrementViewCount" parameterType="long">
+        UPDATE ad
+        SET view_count = COALESCE(view_count, 0) + 1
+        WHERE ad_id = #{adId}
+    </update>
+
+    <!-- 댓글수 감소 (0 미만 방지) -->
+    <update id="decrementCommentCount" parameterType="long">
+        UPDATE ad
+        SET comment_count = GREATEST(COALESCE(comment_count, 0) - 1, 0)
+        WHERE ad_id = #{adId}
+    </update>
+
+
+</mapper>

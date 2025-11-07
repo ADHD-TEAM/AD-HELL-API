@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.adhd.ad_hell.domain.ad_favorite.query.mapper.AdFavoriteMapper">
+
+    <!-- =========================================================
+         ResultMap: DTO 필드와 alias를 정확히 1:1 매핑
+         DTO: com.adhd.ad_hell.domain.ad_favorite.query.dto.response.AdFavoriteDTO
+         ========================================================= -->
+    <resultMap id="AdFavoriteDtoMap"
+               type="com.adhd.ad_hell.domain.ad_favorite.query.dto.response.AdFavoriteDTO">
+        <id     property="id"        column="id"/>
+        <result property="userId"    column="userId"/>
+        <result property="adId"      column="adId"/>
+        <result property="adTitle"   column="adTitle"/>
+        <result property="adName"    column="adName"/>
+        <result property="imageUrl"  column="imageUrl"/>
+        <result property="createdAt" column="createdAt"/>
+    </resultMap>
+
+    <!-- 공통 SELECT 절 -->
+    <sql id="baseColumns">
+        f.fav_id       AS id,
+        f.user_id      AS userId,
+        f.ad_id        AS adId,
+        a.title        AS adTitle,
+        a.name         AS adName,
+        a.image_url    AS imageUrl,
+        f.created_at   AS createdAt
+    </sql>
+
+    <!-- 공통 FROM/JOIN -->
+    <sql id="baseFrom">
+        FROM ad_favorite f
+        JOIN ad a ON a.ad_id = f.ad_id
+    </sql>
+
+    <!-- 공통 WHERE -->
+    <sql id="dynamicWhere">
+        <where>
+            f.user_id = #{userId}
+            <if test="keyword != null and keyword != ''">
+                AND (
+                LOWER(a.title) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                OR LOWER(a.name)  LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                )
+            </if>
+        </where>
+    </sql>
+
+    <!-- =========================================================
+         findMyFavorites(AdFavoriteSearchRequest req)
+         ========================================================= -->
+    <select id="findMyFavorites"
+            parameterType="com.adhd.ad_hell.domain.ad_favorite.query.dto.request.AdFavoriteSearchRequest"
+            resultMap="AdFavoriteDtoMap">
+        <bind name="safeSize" value="size != null and size &gt; 0 ? size : 20"/>
+        <bind name="safePage" value="page != null and page &gt; 0 ? page : 1"/>
+        <bind name="offset"   value="(safePage - 1) * safeSize"/>
+
+        SELECT
+        <include refid="baseColumns"/>
+        <include refid="baseFrom"/>
+        <include refid="dynamicWhere"/>
+        ORDER BY f.created_at DESC, f.fav_id DESC
+        LIMIT #{safeSize} OFFSET #{offset}
+    </select>
+
+    <!-- =========================================================
+         countMyFavorites(AdFavoriteSearchRequest req)
+         ========================================================= -->
+    <select id="countMyFavorites"
+            parameterType="com.adhd.ad_hell.domain.ad_favorite.query.dto.request.AdFavoriteSearchRequest"
+            resultType="long">
+        SELECT COUNT(*)
+        <include refid="baseFrom"/>
+        <include refid="dynamicWhere"/>
+    </select>
+
+    <!-- =========================================================
+         findFavoriteById(Long favoriteId)
+         ========================================================= -->
+    <select id="findFavoriteById"
+            parameterType="long"
+            resultMap="AdFavoriteDtoMap">
+        SELECT
+        <include refid="baseColumns"/>
+        <include refid="baseFrom"/>
+        <where>
+            f.fav_id = #{favoriteId}
+        </where>
+        LIMIT 1
+    </select>
+
+    <!-- =========================================================
+         existsFavorite(@Param userId, adId)
+         ========================================================= -->
+    <select id="existsFavorite"
+            parameterType="map"
+            resultType="boolean">
+        SELECT CASE WHEN COUNT(*) &gt; 0 THEN TRUE ELSE FALSE END
+        FROM ad_favorite f
+        WHERE f.user_id = #{userId}
+          AND f.ad_id   = #{adId}
+    </select>
+
+</mapper>

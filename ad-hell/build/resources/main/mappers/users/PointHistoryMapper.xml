@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adhd.ad_hell.domain.user.query.mapper.PointHistoryMapper">
+  <select id="findMyPointHistory"
+    resultType="com.adhd.ad_hell.domain.user.query.dto.response.UserPointHistoryResponse">
+    SELECT
+          h.id,
+          h.change_amount,
+          h.balance,
+          h.description,
+          h.type,
+          h.created_at
+    FROM point_history h
+    WHERE h.user_id = #{userId}
+    AND h.status = #{pointStatus}
+  </select>
+</mapper>

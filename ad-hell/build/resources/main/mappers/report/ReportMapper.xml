@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adhd.ad_hell.domain.report.query.mapper.ReportMapper">
+  <select id="findReportById"
+    resultType="com.adhd.ad_hell.domain.report.query.dto.response.ReportDetailResponse">
+    SELECT
+          r.id,
+          r.category_id,
+          r.target_id,
+          r.admin_id,
+          r.reporter_id,
+          r.status,
+          r.reason_detail,
+          r.created_at
+    FROM report r
+    WHERE r.id = #{reportId}
+  </select>
+
+  <select id="findReportList"
+    resultType="com.adhd.ad_hell.domain.report.query.dto.response.ReportResponse">
+    SELECT
+          r.id,
+          r.category_id,
+          r.reporter_id,
+          r.status,
+          r.created_at
+    FROM report r
+    <where>
+      <if test="categoryId != null">
+        AND r.category_id = #{categoryId}
+      </if>
+      <if test="status != null">
+        AND r.status = #{status}
+      </if>
+    </where>
+    ORDER BY r.id DESC
+    LIMIT #{ limit } OFFSET #{ offset }
+  </select>
+
+  <select id="findReportsByUserId"
+    resultType="com.adhd.ad_hell.domain.report.query.dto.response.ReportResponse">
+    SELECT
+          r.id,
+          r.category_id,
+          r.reporter_id,
+          r.status,
+          r.created_at
+    FROM report r
+    WHERE r.reporter_id = #{ userId }
+    <if test="categoryId != null">
+      AND r.category_id = #{ categoryId }
+    </if>
+    <if test="status != null">
+      AND r.status = #{ status }
+    </if>
+    ORDER BY r.id DESC
+    LIMIT #{ limit } OFFSET #{ offset }
+  </select>
+
+  <select id="countReports" resultType="long">
+    SELECT COUNT(*)
+    FROM report r
+    <where>
+      <if test="categoryId != null">
+        AND r.category_id = #{categoryId}
+      </if>
+      <if test="status != null">
+        AND r.status = #{status}
+      </if>
+    </where>
+  </select>
+
+  <select id="countMyReports" resultType="long">
+    SELECT COUNT(*)
+    FROM report r
+    WHERE r.reporter_id = #{ userId }
+    <if test="categoryId != null">
+      AND r.category_id = #{ categoryId }
+    </if>
+    <if test="status != null">
+      AND r.status = #{ status }
+    </if>
+  </select>
+</mapper>
