@@ -30,9 +30,10 @@ public enum ErrorCode {
   REWARD_STOCK_INVALID_STATUS("40011", "이미 사용되었거나 만료된 경품입니다.", HttpStatus.BAD_REQUEST),
 
   // 게시판 관련 에러코드
-  BOARD_NOT_FOUND("60001", "게시판을 찾지 못했습니다.", HttpStatus.NOT_FOUND),
-    // 게시글 관련 에러코드
-    COMMENT_NOT_FOUND("70001", "게시글을 찾지 못했습니다.", HttpStatus.NOT_FOUND),
+  BOARD_NOT_FOUND("70001", "게시판을 찾지 못했습니다.", HttpStatus.NOT_FOUND),
+    INVALID_BOARD_STATUS("70002", "유효하지 않은 게시글 상태값입니다.", HttpStatus.BAD_REQUEST),
+    // 게시판 댓글 관련 에러코드
+    COMMENT_NOT_FOUND("70011", "게시글을 찾지 못했습니다.", HttpStatus.NOT_FOUND),
     // 공지사항 관련 에러코드
     ANNOUNCEMENT_NOT_FOUND("80001", "공지사항을 찾지 못했습니다.", HttpStatus.NOT_FOUND),
     // 문의 관련 에러코드
@@ -47,16 +48,14 @@ public enum ErrorCode {
     AD_NOT_FOUND("60001", "광고를 찾지 못했습니다.", HttpStatus.NOT_FOUND),
 
     //파일 관련 에러코드
-  FILE_EMPTY("50001", "업로드된 파일이 비어 있습니다.", HttpStatus.NOT_FOUND),
+    FILE_EMPTY("50001", "업로드된 파일이 비어 있습니다.", HttpStatus.NOT_FOUND),
     FILE_STORE_FAILED("50002", "파일 저장에 실패했습니다.", HttpStatus.NOT_FOUND),
 
     FILE_DIR_CREATE_FAILED("50003","파일 저장소를 만드는데 실패했습니다." ,HttpStatus.BAD_REQUEST ),
-    FILE_NAME_NOT_PRESENT("50004","파일 이름이 입력되지 않았습니다." ,HttpStatus.BAD_REQUEST ),
-    FILE_EXTENSION_NOT_ALLOWED("50005","해당 파일 확장자는 지원하지 않습니다." ,HttpStatus.UNAUTHORIZED ),
-    FILE_SAVE_IO_ERROR("50006","파일 저장에 실패했습니다." ,HttpStatus.INTERNAL_SERVER_ERROR ),
+    FILE_NAME_NOT_PRESENT("50004","파일 이름이 입력되지 않았습니다." ,HttpStatus.BAD_REQUEST ), FILE_EXTENSION_NOT_ALLOWED("50005","해당 파일 확장자는 지원하지 않습니다." ,HttpStatus.UNAUTHORIZED ), FILE_SAVE_IO_ERROR("50006","파일 저장에 실패했습니다." ,HttpStatus.INTERNAL_SERVER_ERROR ),
     FILE_DELETE_IO_ERROR("50007","파일 삭제에 실패했습니다." ,HttpStatus.INTERNAL_SERVER_ERROR ),
     FILE_PATH_TRAVERSAL_DETECTED("50008","파일 경로에 이상이 있습니다." ,HttpStatus.NOT_FOUND ),
-
+    FILE_NOT_FOUND("50009","파일을 찾지 못했습니다.." ,HttpStatus.BAD_REQUEST ),
 
     // 알림 관련 에러코드
     NOTI_NOT_FOUND("100001","알림이 존재하지 않습니다." ,HttpStatus.NOT_FOUND ),

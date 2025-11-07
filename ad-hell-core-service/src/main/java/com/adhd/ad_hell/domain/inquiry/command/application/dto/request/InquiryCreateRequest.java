@@ -15,7 +15,6 @@ public class InquiryCreateRequest {
     private String title;       // 문의 제목
     @NotBlank @Size(max = 5000)
     private String content;     // 문의 내용
-    @NotNull
     private Long userId;        // FK : User
     @NotNull
     private Long categoryId;    // FK : Category

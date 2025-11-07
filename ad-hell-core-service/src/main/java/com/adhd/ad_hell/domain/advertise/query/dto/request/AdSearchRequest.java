@@ -9,8 +9,8 @@ public class AdSearchRequest {
     // 기본값 지정
     private Integer page = 1;
     private Integer size = 10;
-    private Long categoryCode;
-    private String productName;
+    private Long categoryId;
+    private String title;
 
     // page가 null이거나 1보다 작으면 1로 보정
     public int getPage() {

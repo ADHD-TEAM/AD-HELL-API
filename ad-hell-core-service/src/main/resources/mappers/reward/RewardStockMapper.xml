@@ -7,9 +7,9 @@
     resultType="com.adhd.ad_hell.domain.reward.query.dto.response.RewardStockResponse">
     SELECT
           rs.pin_number,
-          rs.expired_at
+          rs.expired_at,
+          rs.status
     FROM reward_stock rs
-    WHERE rs.status = 'ACTIVATE'
-    AND rs.reward_id = #{rewardId}
+    WHERE rs.reward_id = #{rewardId}
   </select>
 </mapper>

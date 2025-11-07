@@ -1,6 +1,4 @@
 spring:
-  application:
-    name: AD-HELL-CORE-SERVICE
   config:
     import: optional:file:.env[.properties]
   data:
@@ -21,7 +19,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create           # create, create-drop, update, validate, none ? ??
+      ddl-auto: create      # create, create-drop, update, validate, none ? ??
     properties:
       hibernate:
         format_sql: true
@@ -71,20 +69,9 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
   mapper-locations: mappers/**/*.xml
-  type-aliases-package: com.adhd.ad_hell.domain.*.query.mapper
 server:
   port: 8088                      # ?? ??
 
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-
-image:
-  image-dir: "C:/Users/Playdata/ad-hell/uploads"
-
-ad:
-  # 정적 매핑이 /uploads/** 라면 이렇게 베이스 URL을 잡아두면 편합니다.
-  adfile-url: "http://localhost:${server.port}/uploads"
+file:
+  file-dir: "C:/Users/Playdata/ad-hell/uploads"
+  base-url: "http://localhost:8080/api/files/"

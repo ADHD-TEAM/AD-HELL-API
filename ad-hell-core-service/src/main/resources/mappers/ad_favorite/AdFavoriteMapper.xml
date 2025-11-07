@@ -5,8 +5,12 @@
 
 <mapper namespace="com.adhd.ad_hell.domain.ad_favorite.query.mapper.AdFavoriteMapper">
 
-    <!-- 공통 결과 매핑: Mapper는 DTO로 반환 -->
-    <resultMap id="AdFavoriteResultMap" type="com.adhd.ad_hell.domain.ad_favorite.query.dto.response.AdFavoriteDTO">
+    <!-- =========================================================
+         ResultMap: DTO 필드와 alias를 정확히 1:1 매핑
+         DTO: com.adhd.ad_hell.domain.ad_favorite.query.dto.response.AdFavoriteDTO
+         ========================================================= -->
+    <resultMap id="AdFavoriteDtoMap"
+               type="com.adhd.ad_hell.domain.ad_favorite.query.dto.response.AdFavoriteDTO">
         <id     property="id"        column="id"/>
         <result property="userId"    column="userId"/>
         <result property="adId"      column="adId"/>
@@ -14,95 +18,92 @@
         <result property="adName"    column="adName"/>
         <result property="imageUrl"  column="imageUrl"/>
         <result property="createdAt" column="createdAt"/>
-        <result property="updatedAt" column="updatedAt"/>
     </resultMap>
 
-    <!-- 정렬 화이트리스트(인젝션 방지) -->
-    <sql id="OrderByClause">
-        ORDER BY
-        <choose>
-            <when test="req.sortBy == 'createdAt'"> f.created_at </when>
-            <when test="req.sortBy == 'updatedAt'"> f.updated_at </when>
-            <when test="req.sortBy == 'adTitle'">   a.title      </when>
-            <when test="req.sortBy == 'adName'">    a.name       </when>
-            <otherwise>                              f.created_at </otherwise>
-        </choose>
-        <choose>
-            <when test="req.direction == 'ASC'"> ASC </when>
-            <otherwise> DESC </otherwise>
-        </choose>
+    <!-- 공통 SELECT 절 -->
+    <sql id="baseColumns">
+        f.fav_id       AS id,
+        f.user_id      AS userId,
+        f.ad_id        AS adId,
+        a.title        AS adTitle,
+        a.name         AS adName,
+        a.image_url    AS imageUrl,
+        f.created_at   AS createdAt
     </sql>
 
-    <!-- 즐겨찾기 목록 (페이징/검색/정렬) -->
-    <select id="findFavorites" resultMap="AdFavoriteResultMap">
-        SELECT
-        f.fav_id      AS id,
-        f.user_id     AS userId,
-        a.ad_id       AS adId,
-        a.title       AS adTitle,
-        a.name        AS adName,
-        a.image_url   AS imageUrl,
-        f.created_at  AS createdAt,
-        f.updated_at  AS updatedAt
+    <!-- 공통 FROM/JOIN -->
+    <sql id="baseFrom">
         FROM ad_favorite f
         JOIN ad a ON a.ad_id = f.ad_id
+    </sql>
+
+    <!-- 공통 WHERE -->
+    <sql id="dynamicWhere">
         <where>
-            <if test="req.userId != null">
-                AND f.user_id = #{req.userId}
-            </if>
-            <if test="req.keyword != null and req.keyword != ''">
+            f.user_id = #{userId}
+            <if test="keyword != null and keyword != ''">
                 AND (
-                a.title LIKE CONCAT('%', #{req.keyword}, '%')
-                OR a.name LIKE CONCAT('%', #{req.keyword}, '%')
+                LOWER(a.title) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                OR LOWER(a.name)  LIKE CONCAT('%', LOWER(#{keyword}), '%')
                 )
             </if>
         </where>
-        <include refid="OrderByClause"/>
-        LIMIT #{req.limit} OFFSET #{req.offset}
-    </select>
+    </sql>
 
-    <!-- 총 건수 (페이징 계산용) -->
-    <select id="countFavorites" resultType="long">
-        SELECT COUNT(1)
-        FROM ad_favorite f
-        JOIN ad a ON a.ad_id = f.ad_id
-        <where>
-            <if test="req.userId != null">
-                AND f.user_id = #{req.userId}
-            </if>
-            <if test="req.keyword != null and req.keyword != ''">
-                AND (
-                a.title LIKE CONCAT('%', #{req.keyword}, '%')
-                OR a.name LIKE CONCAT('%', #{req.keyword}, '%')
-                )
-            </if>
-        </where>
-    </select>
+    <!-- =========================================================
+         findMyFavorites(AdFavoriteSearchRequest req)
+         ========================================================= -->
+    <select id="findMyFavorites"
+            parameterType="com.adhd.ad_hell.domain.ad_favorite.query.dto.request.AdFavoriteSearchRequest"
+            resultMap="AdFavoriteDtoMap">
+        <bind name="safeSize" value="size != null and size &gt; 0 ? size : 20"/>
+        <bind name="safePage" value="page != null and page &gt; 0 ? page : 1"/>
+        <bind name="offset"   value="(safePage - 1) * safeSize"/>
 
-    <!-- 단건 상세 -->
-    <select id="findFavoriteById" resultMap="AdFavoriteResultMap">
         SELECT
-            f.fav_id      AS id,
-            f.user_id     AS userId,
-            a.ad_id       AS adId,
-            a.title       AS adTitle,
-            a.name        AS adName,
-            a.image_url   AS imageUrl,
-            f.created_at  AS createdAt,
-            f.updated_at  AS updatedAt
-        FROM ad_favorite f
-                 JOIN ad a ON a.ad_id = f.ad_id
-        WHERE f.fav_id = #{favoriteId}
+        <include refid="baseColumns"/>
+        <include refid="baseFrom"/>
+        <include refid="dynamicWhere"/>
+        ORDER BY f.created_at DESC, f.fav_id DESC
+        LIMIT #{safeSize} OFFSET #{offset}
     </select>
 
-    <!-- 존재 여부 -->
-    <select id="existsFavorite" resultType="boolean">
-        SELECT EXISTS(
-            SELECT 1
-            FROM ad_favorite
-            WHERE user_id = #{userId}
-              AND ad_id   = #{adId}
-        )
+    <!-- =========================================================
+         countMyFavorites(AdFavoriteSearchRequest req)
+         ========================================================= -->
+    <select id="countMyFavorites"
+            parameterType="com.adhd.ad_hell.domain.ad_favorite.query.dto.request.AdFavoriteSearchRequest"
+            resultType="long">
+        SELECT COUNT(*)
+        <include refid="baseFrom"/>
+        <include refid="dynamicWhere"/>
+    </select>
+
+    <!-- =========================================================
+         findFavoriteById(Long favoriteId)
+         ========================================================= -->
+    <select id="findFavoriteById"
+            parameterType="long"
+            resultMap="AdFavoriteDtoMap">
+        SELECT
+        <include refid="baseColumns"/>
+        <include refid="baseFrom"/>
+        <where>
+            f.fav_id = #{favoriteId}
+        </where>
+        LIMIT 1
+    </select>
+
+    <!-- =========================================================
+         existsFavorite(@Param userId, adId)
+         ========================================================= -->
+    <select id="existsFavorite"
+            parameterType="map"
+            resultType="boolean">
+        SELECT CASE WHEN COUNT(*) &gt; 0 THEN TRUE ELSE FALSE END
+        FROM ad_favorite f
+        WHERE f.user_id = #{userId}
+          AND f.ad_id   = #{adId}
     </select>
 
 </mapper>

@@ -8,12 +8,14 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="ad")
+@SQLDelete(sql = "UPDATE ad SET status = 'DEACTIVATED' where ad_id = ?")
 public class Ad extends BaseTimeEntity {
 
     @Id
@@ -28,7 +30,7 @@ public class Ad extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private AdStatus status = AdStatus.ACTIVATE;
+    private AdStatus status;
 
     private int like_count;
 
@@ -74,7 +76,6 @@ public class Ad extends BaseTimeEntity {
         this.view_count = view_count;
     }
 
-    /* ====== 빌더 ====== */
     @Builder
     private Ad(Long userId, Long categoryId, String title,
                AdStatus status,int like_count,int bookmark_count,
@@ -89,20 +90,25 @@ public class Ad extends BaseTimeEntity {
         this.view_count = 0;
     }
 
-    /* ====== DTO → Entity 변환 ====== */
-    public static Ad fromCreateDto(AdCreateRequest dto) {
+    public static Ad fromCreateDto(AdCreateRequest dto, Long userId) {
         return Ad.builder()
-                .userId(dto.getUserId())
-                .categoryId(dto.getCategoryId())
-                .title(dto.getTitle())
-                .status(dto.getStatus())
-                .like_count(dto.getLike_count())
-                .bookmark_count(dto.getBookmark_count())
-                .comment_count(dto.getComment_count())
-                .view_count(dto.getView_count())
-                .build();
+                 .userId(userId)
+                 .categoryId(dto.getCategoryId())
+                 .title(dto.getTitle())
+                 .status(AdStatus.ACTIVATE)
+                 .like_count(0)
+                 .bookmark_count(0)
+                 .comment_count(0)
+                 .view_count(0)
+                 .build();
     }
 
-
-
+    public void updateAdInfo(String title, Long categoryId) {
+        if (title != null && !title.isBlank()) {
+            this.title = title;
+        }
+        if (categoryId != null) {
+            this.categoryId = categoryId;
+        }
+    }
 }

@@ -10,4 +10,5 @@ public interface AdRepository {
     Ad save(Ad ad);
     Optional<Ad> findById(Long adId);
     void deleteById(Long adId);
+    Integer findTotalScoreById(Long adId);
 }

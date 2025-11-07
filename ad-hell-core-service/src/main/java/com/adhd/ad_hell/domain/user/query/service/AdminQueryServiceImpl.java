@@ -45,10 +45,10 @@ public class AdminQueryServiceImpl implements AdminQueryService {
                             .nickname(user.getNickname())
                             .email(user.getEmail())
                             .status(user.getStatus().name())
-//                            .deactivatedAt(user.getDeactivatedAt().toLocalDate())
-//                            .deletedAt(user.getDeletedAt().toLocalDate())
-//                            .createdAt(user.getCreatedAt().toLocalDate())
-//                            .updatedAt(user.getUpdatedAt().toLocalDate())
+                            .deactivatedAt(user.getDeactivatedAt())
+                            .deletedAt(user.getDeletedAt())
+                            .createdAt(user.getCreatedAt())
+                            .updatedAt(user.getUpdatedAt())
                             .build();
 
         return response;
