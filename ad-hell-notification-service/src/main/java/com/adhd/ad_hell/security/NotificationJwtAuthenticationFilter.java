@@ -32,7 +32,9 @@ public class NotificationJwtAuthenticationFilter extends OncePerRequestFilter {
                 String loginId = tokenProvider.getLoginId(token);
                 String role = tokenProvider.getRole(token);
 
-                if (userId != null && loginId != null) {
+                log.info("[JWT] userId={}, loginId={}, role={}", userId, loginId, role);
+
+                if (loginId != null) {
                     NotificationUserPrincipal principal =
                             new NotificationUserPrincipal(userId, loginId, role);
 

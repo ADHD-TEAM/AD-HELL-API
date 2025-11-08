@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adhd.ad_hell.domain.ad_comment.query.mapper.AdCommentMapper">
+
+    <!-- 단건 조회 -->
+    <select id="selectCommentById"
+            parameterType="long"
+            resultType="com.adhd.ad_hell.domain.ad_comment.query.dto.response.AdCommentDto">
+        SELECT
+        ac.ad_comment_id AS adCommentId,
+        ac.ad_id         AS adId,
+        ac.user_id       AS userId,
+        ac.content       AS content,
+        ac.created_at    AS createdAt,
+        ac.updated_at    AS updateAt
+        FROM ad_comment ac
+        WHERE ac.ad_comment_id = #{adCommentId}
+    </select>
+
+    <!-- 광고별 댓글 목록 -->
+    <select id="selectCommentsByAdId"
+            parameterType="com.adhd.ad_hell.domain.ad_comment.query.dto.request.AdCommentSearchRequest"
+            resultType="com.adhd.ad_hell.domain.ad_comment.query.dto.response.AdCommentDto">
+        SELECT
+        ac.ad_comment_id AS adCommentId,
+        ac.ad_id         AS adId,
+        ac.user_id       AS userId,
+        ac.content       AS content,
+        ac.created_at    AS createdAt,
+        ac.updated_at    AS updateAt
+        FROM ad_comment ac
+        <where>
+            <if test="adId != null">
+                ac.ad_id = #{adId}
+            </if>
+            <if test="userId != null">
+                AND ac.user_id = #{userId}
+            </if>
+            <if test="productName != null and productName != ''">
+                AND ac.content LIKE CONCAT('%', #{productName}, '%')
+            </if>
+        </where>
+        ORDER BY ac.ad_comment_id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 광고별 댓글 개수 -->
+    <select id="countComments"
+            parameterType="com.adhd.ad_hell.domain.ad_comment.query.dto.request.AdCommentSearchRequest"
+            resultType="long">
+        SELECT COUNT(*)
+        FROM ad_comment ac
+        <where>
+            <if test="adId != null">
+                ac.ad_id = #{adId}
+            </if>
+            <if test="userId != null">
+                AND ac.user_id = #{userId}
+            </if>
+            <if test="productName != null and productName != ''">
+                AND ac.content LIKE CONCAT('%', #{productName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 내 댓글 목록 -->
+    <select id="selectMyCommentsByUserId"
+            parameterType="com.adhd.ad_hell.domain.ad_comment.query.dto.request.AdCommentSearchRequest"
+            resultType="com.adhd.ad_hell.domain.ad_comment.query.dto.response.AdCommentDto">
+        SELECT
+        ac.ad_comment_id AS adCommentId,
+        ac.ad_id         AS adId,
+        ac.user_id       AS userId,
+        ac.content       AS content,
+        ac.created_at    AS createdAt,
+        ac.updated_at    AS updateAt
+        FROM ad_comment ac
+        <where>
+            <if test="userId != null">
+                ac.user_id = #{userId}
+            </if>
+            <if test="adId != null">
+                AND ac.ad_id = #{adId}
+            </if>
+            <if test="productName != null and productName != ''">
+                AND ac.content LIKE CONCAT('%', #{productName}, '%')
+            </if>
+        </where>
+        ORDER BY ac.ad_comment_id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 내 댓글 개수 -->
+    <select id="countMyComments"
+            parameterType="com.adhd.ad_hell.domain.ad_comment.query.dto.request.AdCommentSearchRequest"
+            resultType="long">
+        SELECT COUNT(*)
+        FROM ad_comment ac
+        <where>
+            <if test="userId != null">
+                ac.user_id = #{userId}
+            </if>
+            <if test="adId != null">
+                AND ac.ad_id = #{adId}
+            </if>
+            <if test="productName != null and productName != ''">
+                AND ac.content LIKE CONCAT('%', #{productName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 댓글수 증가 -->
+    <update id="incrementCommentCount" parameterType="long">
+        UPDATE ad
+        SET comment_count = COALESCE(comment_count, 0) + 1
+        WHERE ad_id = #{adId}
+    </update>
+
+    <!-- 댓글수 감소 (0 미만 방지) -->
+    <update id="decrementCommentCount" parameterType="long">
+        UPDATE ad
+        SET comment_count = GREATEST(COALESCE(comment_count, 0) - 1, 0)
+        WHERE ad_id = #{adId}
+    </update>
+
+
+</mapper>

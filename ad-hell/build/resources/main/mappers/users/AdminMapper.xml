@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adhd.ad_hell.domain.user.query.mapper.AdminMapper">
+    <select id="findAllByUsers"
+            parameterType="com.adhd.ad_hell.domain.user.query.dto.request.AdminSearchRequest"
+            resultType="com.adhd.ad_hell.domain.user.query.dto.UserDTO">
+        <!-- AdimMapper.findAllByUsers 관리자 - 회원 목록 가져오기 -->
+        SELECT ui.user_id
+             , ui.login_id
+             , ui.role_type
+             , ui.nickname
+             , ui.email
+             , ui.status
+             , ui.deactivated_at
+             , ui.deleted_at
+             , ui.created_at
+             , ui.updated_at
+             , ui.amount
+          FROM user_info ui
+         WHERE 1 = 1
+        <if test="loginId != null and loginId != ''">
+           AND ui.login_id LIKE CONCAT('%', #{loginId}, '%')
+        </if>
+        <if test="nickname != null and nickname != ''">
+           AND ui.nickname LIKE CONCAT('%', #{nickname}, '%')
+        </if>
+        <if test="email != null and email != ''">
+           AND ui.email LIKE CONCAT('%', #{email}, '%')
+        </if>
+        <if test="roleType != null and roleType != ''">
+           AND ui.role_type = #{roleType}
+        </if>
+        <if test="createdAt != null and createdAt != ''">
+            AND ui.created_at = #{createdAt}
+        </if>
+        <if test="deactivatedAt != null and deactivatedAt != ''">
+           AND ui.deactivated_at = #{deactivatedAt}
+        </if>
+        <if test="deletedAt != null and deletedAt != ''">
+            AND ui.deleted_at = #{deletedAt}
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adhd.ad_hell.domain.ranking.query.mapper.AdRankingMapper">
+
+    <!-- ad_rank 테이블의 컬럼과 엔티티 필드 매핑 -->
+    <resultMap id="AdRankMap" type="com.adhd.ad_hell.domain.ranking.command.domain.aggregate.AdRank">
+        <id     column="rank_id"     property="rankId"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="ad_id"       property="adId"/>
+        <result column="score"       property="score"/>
+        <result column="rank"        property="rank"/>
+        <result column="ranked_time" property="rankedTime"/>
+    </resultMap>
+
+    <!-- 스코어 내림차순 Top 20 조회 -->
+    <select id="selectTop20ByScore" resultMap="AdRankMap">
+        SELECT
+            rank_id,
+            category_id,
+            ad_id,
+            score,
+            rank,
+            ranked_time
+        FROM ad_rank
+        ORDER BY score DESC
+            LIMIT 20
+    </select>
+
+</mapper>

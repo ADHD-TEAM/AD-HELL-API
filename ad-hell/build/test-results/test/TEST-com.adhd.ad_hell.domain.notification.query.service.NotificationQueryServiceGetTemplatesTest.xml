@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.query.service.NotificationQueryServiceGetTemplatesTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:19:01.763Z" hostname="DESKTOP-QUJTSAN" time="0.063">
+  <properties/>
+  <testcase name="검색어 없으면 keyword=null, offset=0, size=10 으로 MyBatis 쿼리를 호출하고 Pagination을 계산한다" classname="com.adhd.ad_hell.domain.notification.query.service.NotificationQueryServiceGetTemplatesTest" time="0.056"/>
+  <testcase name="검색어가 있으면 keyword, offset, size를 그대로 MyBatis 쿼리에 전달하고 Pagination을 계산한다" classname="com.adhd.ad_hell.domain.notification.query.service.NotificationQueryServiceGetTemplatesTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

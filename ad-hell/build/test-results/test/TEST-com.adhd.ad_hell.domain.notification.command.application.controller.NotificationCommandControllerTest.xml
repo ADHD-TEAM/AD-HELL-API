@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.command.application.controller.NotificationCommandControllerTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:18:57.039Z" hostname="DESKTOP-QUJTSAN" time="1.259">
+  <properties/>
+  <testcase name="POST /api/admin/notifications/{templateId}/reserve - ADMIN 권한으로 201 Created" classname="com.adhd.ad_hell.domain.notification.command.application.controller.NotificationCommandControllerTest" time="1.003"/>
+  <testcase name="PUT /api/admin/notifications/templates/{templateId} - ADMIN 권한으로 200 OK" classname="com.adhd.ad_hell.domain.notification.command.application.controller.NotificationCommandControllerTest" time="0.058"/>
+  <testcase name="POST /api/admin/notifications/templates - ADMIN 권한으로 201 Created" classname="com.adhd.ad_hell.domain.notification.command.application.controller.NotificationCommandControllerTest" time="0.037"/>
+  <testcase name="PATCH /api/users/{userId}/notifications/{notificationId}/read - 본인 요청 시 200 OK" classname="com.adhd.ad_hell.domain.notification.command.application.controller.NotificationCommandControllerTest" time="0.053"/>
+  <testcase name="PATCH /api/notifications/settings/push - 푸시 설정 변경 시 200 OK" classname="com.adhd.ad_hell.domain.notification.command.application.controller.NotificationCommandControllerTest" time="0.032"/>
+  <testcase name="POST /api/admin/notifications/{templateId}/send - ADMIN 권한으로 202 Accepted" classname="com.adhd.ad_hell.domain.notification.command.application.controller.NotificationCommandControllerTest" time="0.037"/>
+  <testcase name="DELETE /api/admin/notifications/templates/{templateId} - ADMIN 권한으로 200 OK" classname="com.adhd.ad_hell.domain.notification.command.application.controller.NotificationCommandControllerTest" time="0.015"/>
+  <system-out><![CDATA[21:18:47.303 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.adhd.ad_hell.domain.notification.command.application.controller.NotificationCommandControllerTest]: NotificationCommandControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+21:18:48.197 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.adhd.ad_hell.AdHellApplication for test class com.adhd.ad_hell.domain.notification.command.application.controller.NotificationCommandControllerTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.6)
+
+2025-11-07T21:18:50.074+09:00  INFO 20708 --- [    Test worker] .c.a.c.NotificationCommandControllerTest : Starting NotificationCommandControllerTest using Java 21.0.8 with PID 20708 (started by Playdata in C:\Users\Playdata\Documents\AD-HELL-API\ad-hell)
+2025-11-07T21:18:50.076+09:00  INFO 20708 --- [    Test worker] .c.a.c.NotificationCommandControllerTest : No active profile set, falling back to 1 default profile: "default"
+2025-11-07T21:18:56.398+09:00  WARN 20708 --- [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 2cf4bd11-398a-411f-9d23-3d3cb6a9b38a
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2025-11-07T21:18:56.427+09:00  INFO 20708 --- [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-11-07T21:18:56.916+09:00  INFO 20708 --- [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2025-11-07T21:18:56.918+09:00  INFO 20708 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-11-07T21:18:56.921+09:00  INFO 20708 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 3 ms
+2025-11-07T21:18:57.016+09:00  INFO 20708 --- [    Test worker] .c.a.c.NotificationCommandControllerTest : Started NotificationCommandControllerTest in 8.554 seconds (process running for 12.82)
+]]></system-out>
+  <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\Playdata\.gradle\caches\modules-2\files-2.1\net.bytebuddy\byte-buddy-agent\1.17.7\fbf3d6d649ed37fc9e9c59480a05be0a26e3c2da\byte-buddy-agent-1.17.7.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

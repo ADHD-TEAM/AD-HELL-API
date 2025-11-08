@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceCreateTemplateTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:18:58.862Z" hostname="DESKTOP-QUJTSAN" time="0.368">
+  <properties/>
+  <testcase name="공지 알림 템플릿을 정상적으로 등록한다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceCreateTemplateTest" time="0.368"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

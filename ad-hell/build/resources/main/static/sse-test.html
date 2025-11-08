@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Notification SSE 테스트</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        #log {
+            border: 1px solid #ccc;
+            padding: 8px;
+            height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            background: #f9f9f9;
+            font-size: 13px;
+        }
+        .controls {
+            margin-bottom: 12px;
+        }
+        .status {
+            margin-left: 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<h1>알림 SSE 테스트</h1>
+
+<div class="controls">
+    <label>
+        userId:
+        <input id="userIdInput" type="number" placeholder="예: 1" />
+    </label>
+    <button onclick="connect()">Connect</button>
+    <button onclick="disconnect()">Disconnect</button>
+    <span class="status" id="status">DISCONNECTED</span>
+</div>
+
+<div>
+    <strong>로그</strong>
+    <div id="log"></div>
+</div>
+
+<script>
+    let es = null;
+
+    function log(message) {
+        const logEl = document.getElementById('log');
+        const time = new Date().toISOString();
+        logEl.textContent += `[${time}] ${message}\n`;
+        logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function setStatus(text) {
+        document.getElementById('status').textContent = text;
+    }
+
+    function connect() {
+        const userId = document.getElementById('userIdInput').value.trim();
+        if (!userId) {
+            alert('userId를 입력하세요.');
+            return;
+        }
+
+        if (es) {
+            es.close();
+        }
+
+        // 같은 서버에서 띄운다고 가정 (Spring Boot의 static 리소스)
+        const url = `/api/users/${userId}/notifications/stream`;
+        log(`SSE 연결 시도: ${url}`);
+        es = new EventSource(url);
+
+        es.onopen = function () {
+            log('SSE 연결됨');
+            setStatus('CONNECTED');
+        };
+
+        es.onerror = function (event) {
+            log('SSE 에러 발생 (연결이 끊겼을 수도 있음)');
+            setStatus('ERROR / DISCONNECTED');
+            // 끊어졌을 때 자동 재연결을 유지하고 싶으면 close() 호출 안 해도 됨
+        };
+
+        // 기본 message 이벤트 (서버에서 name 없이 보낼 때)
+        es.onmessage = function (event) {
+            log(`[message] ${event.data}`);
+        };
+
+        // 서버에서 name("INIT") 로 보낸 이벤트
+        es.addEventListener('INIT', function (event) {
+            log(`[INIT] ${event.data}`);
+        });
+
+        // 하트비트
+        es.addEventListener('PING', function (event) {
+            log(`[PING] ${event.data}`);
+        });
+
+        // 새 알림 이벤트
+        es.addEventListener('NOTIFICATION', function (event) {
+            try {
+                const data = JSON.parse(event.data);
+                log('[NOTIFICATION] ' + JSON.stringify(data, null, 2));
+            } catch (e) {
+                log('[NOTIFICATION] (JSON 파싱 실패) ' + event.data);
+            }
+        });
+
+        // 미읽음 카운트 이벤트
+        es.addEventListener('UNREAD_COUNT', function (event) {
+            try {
+                const data = JSON.parse(event.data);
+                log('[UNREAD_COUNT] count=' + data.count);
+            } catch (e) {
+                log('[UNREAD_COUNT] (JSON 파싱 실패) ' + event.data);
+            }
+        });
+    }
+
+    function disconnect() {
+        if (es) {
+            es.close();
+            es = null;
+            log('SSE 연결 종료');
+            setStatus('DISCONNECTED');
+        }
+    }
+</script>
+</body>
+</html>

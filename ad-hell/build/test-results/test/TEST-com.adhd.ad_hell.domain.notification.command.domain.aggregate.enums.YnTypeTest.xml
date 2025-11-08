@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.command.domain.aggregate.enums.YnTypeTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:18:59.876Z" hostname="DESKTOP-QUJTSAN" time="0.011">
+  <properties/>
+  <testcase name="valuesAndValueOfCovered()" classname="com.adhd.ad_hell.domain.notification.command.domain.aggregate.enums.YnTypeTest" time="0.002"/>
+  <testcase name="yesNoAndIsYes()" classname="com.adhd.ad_hell.domain.notification.command.domain.aggregate.enums.YnTypeTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

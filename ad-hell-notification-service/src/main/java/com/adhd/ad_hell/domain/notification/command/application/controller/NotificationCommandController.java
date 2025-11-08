@@ -177,7 +177,7 @@ public class NotificationCommandController {
                     description = "요청 값 검증 실패"
             )
     })
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/api/admin/notifications/templates")
     public ResponseEntity<ApiResponse<NotificationTemplateResponse>> createTemplate(
             @Valid @RequestBody NotificationTemplateCreateRequest request

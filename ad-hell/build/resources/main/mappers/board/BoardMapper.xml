@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.adhd.ad_hell.domain.board.query.mapper.BoardMapper">
+
+    <!-- ===================== Files (nested) ===================== -->
+    <!-- 게시글에 연결된 파일 리스트 + fileUrl 조립 -->
+    <select id="findFilesByBoardId"
+            parameterType="map"
+            resultType="com.adhd.ad_hell.domain.advertise.query.dto.response.AdFileDto">
+        SELECT
+            f.file_id            AS fileId,
+            f.origin_file_name   AS originFileName,
+            f.stored_name        AS storedName,
+            CONCAT(#{baseUrl}, f.stored_name) AS fileUrl,
+            f.file_type          AS fileType
+        FROM ad_file f
+        WHERE f.board_id = #{boardId}
+        ORDER BY f.file_id ASC
+    </select>
+
+    <!-- ===================== ResultMaps ===================== -->
+    <!-- 목록용: 요약 + 파일 리스트 -->
+    <resultMap id="BoardSummaryMap"
+               type="com.adhd.ad_hell.domain.board.query.dto.response.BoardSummaryResponse">
+        <id     property="id"           column="id"/>
+        <result property="title"        column="title"/>
+        <result property="status"       column="status"/>
+        <result property="viewCount"    column="viewCount"/>
+        <result property="categoryName" column="categoryName"/>
+        <result property="writerName"   column="writerName"/>
+        <result property="createdAt"    column="createdAt"/>
+
+        <!-- nested select: 상수 컬럼 baseUrl을 함께 전달 -->
+        <collection property="files"
+                    ofType="com.adhd.ad_hell.domain.advertise.query.dto.response.AdFileDto"
+                    column="{boardId=id, baseUrl=baseUrl}"
+                    select="findFilesByBoardId"/>
+    </resultMap>
+
+    <!-- 상세용: 본문 + 파일 리스트 -->
+    <resultMap id="BoardDetailMap"
+               type="com.adhd.ad_hell.domain.board.query.dto.response.BoardDetailResponse">
+        <id     property="id"           column="id"/>
+        <result property="title"        column="title"/>
+        <result property="content"      column="content"/>
+        <result property="status"       column="status"/>
+        <result property="viewCount"    column="viewCount"/>
+        <result property="categoryId"   column="categoryId"/>
+        <result property="categoryName" column="categoryName"/>
+        <result property="writerId"     column="writerId"/>
+        <result property="writerName"   column="writerName"/>
+        <result property="createdAt"    column="createdAt"/>
+        <result property="updatedAt"    column="updatedAt"/>
+
+        <collection property="files"
+                    ofType="com.adhd.ad_hell.domain.advertise.query.dto.response.AdFileDto"
+                    column="{boardId=id, baseUrl=baseUrl}"
+                    select="findFilesByBoardId"/>
+    </resultMap>
+
+    <!-- ===================== Queries ===================== -->
+
+    <!-- 게시글 목록 조회 (검색 + 정렬 + 페이징) -->
+    <select id="findAllBoards"
+            parameterType="map"
+            resultMap="BoardSummaryMap">
+
+        SELECT
+        b.board_id       AS id,
+        b.board_title    AS title,
+        b.board_status   AS status,
+        b.view_count     AS viewCount,
+        c.name           AS categoryName,
+        u.nickname       AS writerName,
+        b.created_at     AS createdAt,
+        #{baseUrl}       AS baseUrl       <!-- nested select에 전달할 상수 컬럼 -->
+        FROM board b
+        JOIN category  c ON c.id      = b.category_id
+        JOIN user_info u ON u.user_id = b.user_id
+
+        <where>
+            <if test="request.keyword != null and request.keyword != ''">
+                AND (LOWER(b.board_title)   LIKE CONCAT('%', LOWER(#{request.keyword}), '%')
+                OR  LOWER(b.board_content) LIKE CONCAT('%', LOWER(#{request.keyword}), '%'))
+            </if>
+            <if test="request.status != null and request.status != ''">
+                AND b.board_status = #{request.status}
+            </if>
+            <if test="request.categoryId != null">
+                AND b.category_id = #{request.categoryId}
+            </if>
+        </where>
+
+        <choose>
+            <when test="request.sortBy == 'title'">
+                ORDER BY b.board_title
+            </when>
+            <when test="request.sortBy == 'viewCount'">
+                ORDER BY b.view_count
+            </when>
+            <otherwise>
+                ORDER BY b.created_at
+            </otherwise>
+        </choose>
+
+        <choose>
+            <when test="request.direction != null and request.direction.toUpperCase() == 'ASC'">ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
+
+        LIMIT #{request.limit} OFFSET #{request.offset}
+    </select>
+
+    <!-- 총 개수 -->
+    <select id="countAllBoards"
+            parameterType="com.adhd.ad_hell.domain.board.query.dto.request.BoardSearchRequest"
+            resultType="long">
+        SELECT COUNT(1)
+        FROM board b
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (LOWER(b.board_title)   LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                OR  LOWER(b.board_content) LIKE CONCAT('%', LOWER(#{keyword}), '%'))
+            </if>
+            <if test="status != null and status != ''">
+                AND b.board_status = #{status}
+            </if>
+            <if test="categoryId != null">
+                AND b.category_id = #{categoryId}
+            </if>
+        </where>
+    </select>
+
+    <!-- 상세 조회 -->
+    <select id="findBoardDetailById"
+            parameterType="map"
+            resultMap="BoardDetailMap">
+        SELECT
+        b.board_id       AS id,
+        b.board_title    AS title,
+        b.board_content  AS content,
+        b.board_status   AS status,
+        b.view_count     AS viewCount,
+        c.id             AS categoryId,
+        c.name           AS categoryName,
+        u.user_id        AS writerId,
+        u.nickname       AS writerName,
+        b.created_at     AS createdAt,
+        b.updated_at     AS updatedAt,
+        #{baseUrl}       AS baseUrl      <!-- nested select에 전달할 상수 컬럼 -->
+        FROM board b
+        JOIN category  c ON c.id      = b.category_id
+        JOIN user_info u ON u.user_id = b.user_id
+        WHERE b.board_id = #{boardId}
+    </select>
+
+    <!-- 조회 수 증가 -->
+    <update id="increaseViewCount" parameterType="long">
+        UPDATE board
+        SET view_count = view_count + 1
+        WHERE board_id = #{boardId}
+    </update>
+
+</mapper>

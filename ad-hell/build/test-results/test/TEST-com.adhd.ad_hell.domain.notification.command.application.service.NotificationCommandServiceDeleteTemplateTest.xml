@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceDeleteTemplateTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:18:59.235Z" hostname="DESKTOP-QUJTSAN" time="0.025">
+  <properties/>
+  <testcase name="템플릿 삭제 성공 – deletedYn 이 Y 로 변경된다 (soft delete)" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceDeleteTemplateTest" time="0.009"/>
+  <testcase name="템플릿이 존재하지 않으면 IllegalArgumentException을 던진다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceDeleteTemplateTest" time="0.015"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

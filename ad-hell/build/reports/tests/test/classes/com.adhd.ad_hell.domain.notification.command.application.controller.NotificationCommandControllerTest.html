@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - NotificationCommandControllerTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>NotificationCommandControllerTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.adhd.ad_hell.domain.notification.command.application.controller.html">com.adhd.ad_hell.domain.notification.command.application.controller</a> &gt; NotificationCommandControllerTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">7</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">1.235s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+<li>
+<a href="#">Standard error</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">POST /api/admin/notifications/templates - ADMIN 권한으로 201 Created</td>
+<td class="success">createTemplate()</td>
+<td class="success">0.037s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">DELETE /api/admin/notifications/templates/{templateId} - ADMIN 권한으로 200 OK</td>
+<td class="success">deleteTemplate()</td>
+<td class="success">0.015s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">PATCH /api/users/{userId}/notifications/{notificationId}/read - 본인 요청 시 200 OK</td>
+<td class="success">markRead()</td>
+<td class="success">0.053s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">POST /api/admin/notifications/{templateId}/reserve - ADMIN 권한으로 201 Created</td>
+<td class="success">reserveNotification()</td>
+<td class="success">1.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">POST /api/admin/notifications/{templateId}/send - ADMIN 권한으로 202 Accepted</td>
+<td class="success">sendNotification()</td>
+<td class="success">0.037s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">PATCH /api/notifications/settings/push - 푸시 설정 변경 시 200 OK</td>
+<td class="success">updatePushSetting()</td>
+<td class="success">0.032s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">PUT /api/admin/notifications/templates/{templateId} - ADMIN 권한으로 200 OK</td>
+<td class="success">updateTemplate()</td>
+<td class="success">0.058s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>21:18:47.303 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.adhd.ad_hell.domain.notification.command.application.controller.NotificationCommandControllerTest]: NotificationCommandControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+21:18:48.197 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.adhd.ad_hell.AdHellApplication for test class com.adhd.ad_hell.domain.notification.command.application.controller.NotificationCommandControllerTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.6)
+
+2025-11-07T21:18:50.074+09:00  INFO 20708 --- [    Test worker] .c.a.c.NotificationCommandControllerTest : Starting NotificationCommandControllerTest using Java 21.0.8 with PID 20708 (started by Playdata in C:\Users\Playdata\Documents\AD-HELL-API\ad-hell)
+2025-11-07T21:18:50.076+09:00  INFO 20708 --- [    Test worker] .c.a.c.NotificationCommandControllerTest : No active profile set, falling back to 1 default profile: &quot;default&quot;
+2025-11-07T21:18:56.398+09:00  WARN 20708 --- [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 2cf4bd11-398a-411f-9d23-3d3cb6a9b38a
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2025-11-07T21:18:56.427+09:00  INFO 20708 --- [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-11-07T21:18:56.916+09:00  INFO 20708 --- [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2025-11-07T21:18:56.918+09:00  INFO 20708 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-11-07T21:18:56.921+09:00  INFO 20708 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 3 ms
+2025-11-07T21:18:57.016+09:00  INFO 20708 --- [    Test worker] .c.a.c.NotificationCommandControllerTest : Started NotificationCommandControllerTest in 8.554 seconds (process running for 12.82)
+</pre>
+</span>
+</div>
+<div class="tab">
+<h2>Standard error</h2>
+<span class="code">
+<pre>Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\Playdata\.gradle\caches\modules-2\files-2.1\net.bytebuddy\byte-buddy-agent\1.17.7\fbf3d6d649ed37fc9e9c59480a05be0a26e3c2da\byte-buddy-agent-1.17.7.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 8.14.3</a> at 2025. 11. 7. 오후 9:19:02</p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceSendNotificationTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:18:59.669Z" hostname="DESKTOP-QUJTSAN" time="0.122">
+  <properties/>
+  <testcase name="CUSTOM 타입인데 대상 회원 목록이 비어있으면 IllegalArgumentException(CUSTOM 발송은 대상 회원 목록이 필요) 을 던진다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceSendNotificationTest" time="0.015"/>
+  <testcase name="ALL 타입이면 PushPreferencePort.findAllKnownMembers() 를 사용해 모든 known 멤버에게 발송한다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceSendNotificationTest" time="0.01"/>
+  <testcase name="variables 가 null 인 경우 mergeVariables 에서 원본 제목/본문이 그대로 사용된다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceSendNotificationTest" time="0.017"/>
+  <testcase name="템플릿 제목이 null 이면 mergeVariables 에서 그대로 null 반환" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceSendNotificationTest" time="0.012"/>
+  <testcase name="targetType 이 null이면 IllegalArgumentException(발송 대상 타입은 필수입니다.) 을 던진다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceSendNotificationTest" time="0.012"/>
+  <testcase name="템플릿이 존재하지 않으면 IllegalArgumentException 을 던진다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceSendNotificationTest" time="0.008"/>
+  <testcase name="PUSH_ENABLED 대상이 없으면 Notification 을 저장하지 않고 recipientCount=0 을 반환한다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceSendNotificationTest" time="0.013"/>
+  <testcase name="variables 가 비어 있으면 mergeVariables 에서 원본 문자열 그대로 사용한다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceSendNotificationTest" time="0.008"/>
+  <testcase name="PUSH_ENABLED 대상으로 공지 발송 시 푸시 ON 회원 수만큼 Notification이 저장되고 이벤트가 발행된다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceSendNotificationTest" time="0.013"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

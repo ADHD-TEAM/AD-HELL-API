@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceReserveNotificationTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:18:59.608Z" hostname="DESKTOP-QUJTSAN" time="0.057">
+  <properties/>
+  <testcase name="scheduledAt 이 null 이면 IllegalArgumentException 이 발생한다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceReserveNotificationTest" time="0.016"/>
+  <testcase name="scheduledAt 이 현재 시각 이전이면 IllegalArgumentException 이 발생한다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceReserveNotificationTest" time="0.008"/>
+  <testcase name="미래 시각으로 공지 알림 예약 시 SCHEDULED 상태로 예약이 등록되고 응답이 반환된다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceReserveNotificationTest" time="0.013"/>
+  <testcase name="예약 시각은 유효하지만 템플릿이 존재하지 않으면 IllegalArgumentException(템플릿이 존재하지 않습니다.) 을 던진다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceReserveNotificationTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

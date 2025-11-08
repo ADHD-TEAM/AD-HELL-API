@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adhd.ad_hell.domain.reward.query.mapper.RewardMapper">
+  <select id="findRewardById"
+    resultType="com.adhd.ad_hell.domain.reward.query.dto.RewardDto">
+    SELECT
+          r.id,
+          r.name,
+          r.description,
+          r.point_cost AS pointCost,
+          r.stock,
+          r.status,
+          c.id AS categoryId,
+          c.name AS categoryName,
+          pc.id AS parentCategoryId,
+          pc.name AS parentCategoryName
+    FROM reward r
+    LEFT JOIN category c ON r.category_id = c.id
+    LEFT JOIN category pc ON c.parent_id = pc.id
+    WHERE r.status != 'DELETE'
+    AND c.status = 'ACTIVATE'
+    AND r.id = #{rewardId}
+  </select>
+
+  <select id="findRewards"
+    resultType="com.adhd.ad_hell.domain.reward.query.dto.RewardDto">
+    SELECT
+          r.id,
+          r.name,
+          r.point_cost AS pointCost,
+          r.stock,
+          r.status,
+          c.id AS categoryId,
+          c.name AS categoryName,
+          pc.id AS parentCategoryId,
+          pc.name AS parentCategoryName
+    FROM reward r
+    LEFT JOIN category c ON r.category_id = c.id
+    LEFT JOIN category pc ON c.parent_id = pc.id
+    WHERE r.status != 'DELETE'
+    AND c.status = 'ACTIVATE'
+    <if test="categoryId != null">
+      AND r.category_id = #{categoryId}
+    </if>
+    <if test="name != null and name != ''">
+      AND r.name LIKE CONCAT('%', #{name}, '%')
+    </if>
+    ORDER BY r.id DESC
+    LIMIT #{ limit } OFFSET #{ offset }
+  </select>
+  <select id="countRewards" resultType="long">
+    SELECT COUNT(*)
+    FROM reward r
+    LEFT JOIN category c ON r.category_id = c.id
+    LEFT JOIN category pc ON c.parent_id = pc.id
+    WHERE r.status != 'DELETE'
+    AND c.status = 'ACTIVATE'
+    <if test="categoryId != null">
+      AND r.category_id = #{ categoryId }
+    </if>
+    <if test="name != null and name != ''">
+      AND r.name LIKE CONCAT('%', #{name}, '%')
+    </if>
+  </select>
+</mapper>

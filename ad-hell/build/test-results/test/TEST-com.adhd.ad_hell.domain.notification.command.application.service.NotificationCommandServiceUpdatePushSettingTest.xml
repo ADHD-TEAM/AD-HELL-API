@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceUpdatePushSettingTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:18:59.794Z" hostname="DESKTOP-QUJTSAN" time="0.019">
+  <properties/>
+  <testcase name="pushEnabled 가 null이면 Boolean.TRUE.equals(null) 이므로 false 로 간주된다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceUpdatePushSettingTest" time="0.005"/>
+  <testcase name="푸시 ON 요청 시 pushPref.setEnabled(memberId, true)가 호출된다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceUpdatePushSettingTest" time="0.006"/>
+  <testcase name="푸시 OFF 요청 시 pushPref.setEnabled(memberId, false)가 호출된다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceUpdatePushSettingTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

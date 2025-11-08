@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.query.service.NotificationQueryServiceGetUserNotificationsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:19:01.829Z" hostname="DESKTOP-QUJTSAN" time="0.026">
+  <properties/>
+  <testcase name="회원 알림 목록 조회 시, MyBatis Mapper를 통해 페이지네이션된 NotificationPageResponse 를 반환한다" classname="com.adhd.ad_hell.domain.notification.query.service.NotificationQueryServiceGetUserNotificationsTest" time="0.008"/>
+  <testcase name="size 가 0 이하이면 DEFAULT_PAGE_SIZE(10)을 사용한다" classname="com.adhd.ad_hell.domain.notification.query.service.NotificationQueryServiceGetUserNotificationsTest" time="0.005"/>
+  <testcase name="미읽음 카운트 조회 시 YnType.N 기준 count 를 반환한다" classname="com.adhd.ad_hell.domain.notification.query.service.NotificationQueryServiceGetUserNotificationsTest" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

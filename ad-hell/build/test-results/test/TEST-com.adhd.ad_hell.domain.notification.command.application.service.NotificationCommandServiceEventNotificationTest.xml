@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceEventNotificationTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:18:59.266Z" hostname="DESKTOP-QUJTSAN" time="0.283">
+  <properties/>
+  <testcase name="NOTI_PSH_002 - CUSTOM 타겟으로 이벤트 알림 발송 시 Notification 저장 및 이벤트 발행" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceEventNotificationTest" time="0.283"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

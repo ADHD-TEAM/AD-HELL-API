@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adhd.ad_hell.domain.category.query.mapper.CategoryMapper">
+
+  <select id="findAllCategories"
+    resultType="com.adhd.ad_hell.domain.category.query.dto.response.CategoryTreeResponse">
+    SELECT
+          c.id,
+          c.name,
+          c.description,
+          c.status,
+          c.parent_id AS parentId
+    FROM category c
+    WHERE c.status = 'ACTIVATE'
+    <if test="keyword != null and keyword != ''">
+      AND c.name LIKE CONCAT('%', #{keyword}, '%')
+    </if>
+    ORDER BY c.parent_id, c.id
+  </select>
+
+  <select id="findCategoryById"
+    resultType="com.adhd.ad_hell.domain.category.query.dto.response.CategoryDetailResponse">
+    SELECT
+          c.id,
+          c.name,
+          c.description,
+          c.status,
+          c.parent_id AS parentId,
+          p.name AS parentName
+    FROM category c
+    LEFT JOIN category p ON c.parent_id = p.id
+    WHERE c.id = #{categoryId}
+    AND c.status = 'ACTIVATE'
+  </select>
+
+  <select id="getCategoryEntityById"
+    resultType="com.adhd.ad_hell.domain.category.command.domain.aggregate.Category">
+    SELECT
+          c.id,
+          c.name,
+          c.description,
+          c.status,
+          c.parent_id AS parentId
+    FROM category c
+    WHERE c.id = #{categoryId}
+    AND c.status = 'ACTIVATE'
+  </select>
+</mapper>

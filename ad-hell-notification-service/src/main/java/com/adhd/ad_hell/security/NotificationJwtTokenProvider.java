@@ -71,10 +71,13 @@ public class NotificationJwtTokenProvider {
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(secretKey)     // 코어와 같은 키로 서명 검증
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
                 .build()
-                .parseSignedClaims(token)  // parseSignedClaims 사용
-                .getPayload();             // claims
+                .parseSignedClaims(token)
+                .getPayload();
+
+        log.info("[JWT] claims={}", claims);
+        return claims;         // claims
     }
 }

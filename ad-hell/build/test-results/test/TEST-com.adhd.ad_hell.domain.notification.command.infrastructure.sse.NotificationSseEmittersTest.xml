@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.command.infrastructure.sse.NotificationSseEmittersTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:18:59.896Z" hostname="DESKTOP-QUJTSAN" time="0.02">
+  <properties/>
+  <testcase name="sendToUser 호출 시 예외가 발생하는 emitter 는 내부 레지스트리에서 제거된다" classname="com.adhd.ad_hell.domain.notification.command.infrastructure.sse.NotificationSseEmittersTest" time="0.016"/>
+  <testcase name="add(userId) 호출 시 SseEmitter 가 생성되고 이후 sendToUser, broadcast 호출 시 예외 없이 동작한다" classname="com.adhd.ad_hell.domain.notification.command.infrastructure.sse.NotificationSseEmittersTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.command.application.service.JpaPushPreferenceAdapterTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:18:58.326Z" hostname="DESKTOP-QUJTSAN" time="0.528">
+  <properties/>
+  <testcase name="신규 회원의 푸시 설정을 ON 으로 등록하면 Y 상태로 insert 된다" classname="com.adhd.ad_hell.domain.notification.command.application.service.JpaPushPreferenceAdapterTest" time="0.474"/>
+  <testcase name="기존 회원의 푸시 설정을 OFF 로 변경하면 N 상태로 update 된다" classname="com.adhd.ad_hell.domain.notification.command.application.service.JpaPushPreferenceAdapterTest" time="0.008"/>
+  <testcase name="findAllEnabled - push_enabled=Y 인 회원만 반환한다" classname="com.adhd.ad_hell.domain.notification.command.application.service.JpaPushPreferenceAdapterTest" time="0.008"/>
+  <testcase name="isEnabled - 레코드가 Y 이면 true 를 반환한다" classname="com.adhd.ad_hell.domain.notification.command.application.service.JpaPushPreferenceAdapterTest" time="0.009"/>
+  <testcase name="isEnabled - 레코드가 없으면 on default 로 true 를 반환한다" classname="com.adhd.ad_hell.domain.notification.command.application.service.JpaPushPreferenceAdapterTest" time="0.01"/>
+  <testcase name="findAllKnownMembers - 저장소에 존재하는 모든 회원 ID 를 반환한다" classname="com.adhd.ad_hell.domain.notification.command.application.service.JpaPushPreferenceAdapterTest" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceUpdateTemplateTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:18:59.834Z" hostname="DESKTOP-QUJTSAN" time="0.017">
+  <properties/>
+  <testcase name="템플릿이 존재하지 않으면 IllegalArgumentException을 던진다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceUpdateTemplateTest" time="0.009"/>
+  <testcase name="템플릿 수정 성공 – 엔티티가 수정되고 Response에 반영된다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceUpdateTemplateTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

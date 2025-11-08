@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.adhd.ad_hell.domain.board_comment.query.mapper.BoardCommentMapper">
+
+    <!-- =======================================================
+         댓글 목록 조회 (게시판별)
+         ======================================================= -->
+    <select id="findAllBoardComments"
+            parameterType="com.adhd.ad_hell.domain.board_comment.query.dto.request.BoardCommentSearchRequest"
+            resultType="com.adhd.ad_hell.domain.board_comment.query.dto.response.BoardCommentSummaryResponse">
+
+        SELECT
+        c.comment_id       AS id,
+        c.user_id          AS writerId,
+        u.nickname         AS writerName,
+        c.content          AS content,
+        c.created_at       AS createdAt,
+        c.updated_at       AS updatedAt
+        FROM board_comment c
+        JOIN user_info u ON u.user_id = c.user_id
+        <where>
+            <if test="boardId != null">
+                AND c.board_id = #{boardId}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND c.content LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <!-- 비활성화된 유저는 제외 (status = 'ACTIVE' 만) -->
+            AND u.status = 'ACTIVE'
+        </where>
+        ORDER BY c.comment_id DESC
+        LIMIT #{size} OFFSET ${(page - 1) * size}
+    </select>
+
+
+    <!-- =======================================================
+         내 댓글 목록 조회
+         ======================================================= -->
+    <select id="findMyComments"
+            parameterType="com.adhd.ad_hell.domain.board_comment.query.dto.request.BoardCommentSearchRequest"
+            resultType="com.adhd.ad_hell.domain.board_comment.query.dto.response.BoardCommentSummaryResponse">
+
+        SELECT
+            c.comment_id       AS id,
+            c.user_id          AS writerId,
+            u.nickname         AS writerName,
+            c.content          AS content,
+            c.created_at       AS createdAt,
+            c.updated_at       AS updatedAt
+        FROM board_comment c
+                 JOIN user_info u ON u.user_id = c.user_id
+        WHERE c.user_id = #{writerId}
+          AND u.status = 'ACTIVE'
+        ORDER BY c.comment_id DESC
+            LIMIT #{size} OFFSET ${(page - 1) * size}
+    </select>
+
+
+    <!-- =======================================================
+         댓글 단건 상세 조회
+         ======================================================= -->
+    <select id="findCommentById"
+            parameterType="long"
+            resultType="com.adhd.ad_hell.domain.board_comment.query.dto.response.BoardCommentDetailResponse">
+
+        SELECT
+            c.comment_id       AS id,
+            c.board_id         AS boardId,
+            c.user_id          AS writerId,
+            u.nickname         AS writerName,
+            u.login_id         AS writerLoginId,
+            u.email            AS writerEmail,
+            u.role_type        AS writerRole,
+            c.content          AS content,
+            c.created_at       AS createdAt,
+            c.updated_at       AS updatedAt
+        FROM board_comment c
+                 JOIN user_info u ON u.user_id = c.user_id
+        WHERE c.comment_id = #{id}
+          AND u.status = 'ACTIVE'
+    </select>
+
+
+    <!-- =======================================================
+         전체 개수 (페이징 계산용)
+         ======================================================= -->
+    <select id="countComments"
+            parameterType="com.adhd.ad_hell.domain.board_comment.query.dto.request.BoardCommentSearchRequest"
+            resultType="long">
+
+        SELECT COUNT(*)
+        FROM board_comment c
+        JOIN user_info u ON u.user_id = c.user_id
+        <where>
+            <if test="boardId != null">
+                AND c.boaBoardCommentMapper rd_id = #{boardId}
+            </if>
+            <if test="writerId != null">
+                AND c.user_id = #{writerId}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND c.content LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            AND u.status = 'ACTIVE'
+        </where>
+    </select>
+
+</mapper>

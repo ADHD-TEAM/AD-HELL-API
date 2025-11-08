@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceMarkReadTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-11-07T12:18:59.553Z" hostname="DESKTOP-QUJTSAN" time="0.047">
+  <properties/>
+  <testcase name="본인 알림을 읽음 처리하면 readYn=Y 로 변경되고 AFTER_COMMIT 시 NotificationReadEvent 가 발행된다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceMarkReadTest" time="0.013"/>
+  <testcase name="알림이 존재하지 않으면 IllegalArgumentException 을 던진다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceMarkReadTest" time="0.012"/>
+  <testcase name="이미 읽은 알림을 다시 읽음 처리해도 상태는 유지되고 AFTER_COMMIT 시 NotificationReadEvent 는 발행된다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceMarkReadTest" time="0.009"/>
+  <testcase name="다른 사용자의 알림은 읽음 처리할 수 없으며 IllegalStateException 을 던진다" classname="com.adhd.ad_hell.domain.notification.command.application.service.NotificationCommandServiceMarkReadTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
