@@ -219,5 +219,61 @@ class BoardCommandServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("removeOneImageBoard 메서드는")
+    class Describe_removeOneImageBoard {
 
+        @Test
+        @DisplayName("게시판과 저장된 파일 이름이 주어지면 파일을 삭제한다")
+        void it_deletes_a_file_when_given_a_board_and_a_stored_file_name() {
+            // given
+            Long boardId = 1L;
+            String storedName = "test.jpg";
+            Board board = mock(Board.class);
+            AdFile adFile = mock(AdFile.class);
+            List<AdFile> files = new ArrayList<>();
+            files.add(adFile);
+
+
+            given(boardRepository.findById(boardId)).willReturn(Optional.of(board));
+            given(board.getFiles()).willReturn(files);
+            given(adFile.getStoredName()).willReturn(storedName);
+
+            // when
+            boardCommandService.removeOneImageBoard(boardId, storedName);
+
+            // then
+            verify(fileStorage).deleteQuietly(storedName);
+        }
+
+        @Test
+        @DisplayName("게시판을 찾을 수 없으면 BusinessException을 발생시킨다")
+        void it_throws_a_business_exception_when_the_board_is_not_found() {
+            // given
+            Long boardId = 1L;
+            String storedName = "test.jpg";
+            given(boardRepository.findById(boardId)).willReturn(Optional.empty());
+
+            // when / then
+            assertThatThrownBy(() -> boardCommandService.removeOneImageBoard(boardId, storedName))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessage(ErrorCode.BOARD_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        @DisplayName("파일을 찾을 수 없으면 BusinessException을 발생시킨다")
+        void it_throws_a_business_exception_when_the_file_is_not_found() {
+            // given
+            Long boardId = 1L;
+            String storedName = "test.jpg";
+            Board board = mock(Board.class);
+            given(boardRepository.findById(boardId)).willReturn(Optional.of(board));
+            given(board.getFiles()).willReturn(java.util.Collections.emptyList());
+
+            // when / then
+            assertThatThrownBy(() -> boardCommandService.removeOneImageBoard(boardId, storedName))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessage(ErrorCode.FILE_NOT_FOUND.getMessage());
+        }
+    }
 }
