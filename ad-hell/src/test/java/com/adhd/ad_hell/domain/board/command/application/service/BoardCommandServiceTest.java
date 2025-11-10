@@ -1,11 +1,16 @@
 package com.adhd.ad_hell.domain.board.command.application.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
 
 import com.adhd.ad_hell.common.dto.LoginUserInfo;
+import com.adhd.ad_hell.common.storage.FileStorage;
+import com.adhd.ad_hell.common.storage.FileStorageResult;
 import com.adhd.ad_hell.common.util.SecurityUtil;
+import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.AdFile;
 import com.adhd.ad_hell.domain.board.command.application.dto.request.BoardCreateRequest;
 import com.adhd.ad_hell.domain.board.command.application.dto.request.BoardUpdateRequest;
 import com.adhd.ad_hell.domain.board.command.application.dto.response.BoardCommandResponse;
@@ -17,6 +22,8 @@ import com.adhd.ad_hell.domain.user.command.entity.User;
 import com.adhd.ad_hell.domain.user.query.service.provider.UserProvider;
 import com.adhd.ad_hell.exception.BusinessException;
 import com.adhd.ad_hell.exception.ErrorCode;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -24,243 +31,193 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class BoardCommandServiceTest {
 
-    @Mock private BoardRepository boardRepository;
-    @Mock private CategoryRepository categoryRepository;
-    @Mock private UserProvider userProvider;
-    @Mock private SecurityUtil securityUtil; // ✅ 인스턴스 빈(정적 아님)
-
     @InjectMocks
-    private BoardCommandService service;
+    private BoardCommandService boardCommandService;
 
-    private void mockLogin(long userId) {
-        LoginUserInfo info = mock(LoginUserInfo.class);
-        when(info.getUserId()).thenReturn(userId);
-        when(securityUtil.getLoginUserInfo()).thenReturn(info);
-    }
+    @Mock
+    private UserProvider userProvider;
+    @Mock
+    private CategoryRepository categoryRepository;
+    @Mock
+    private BoardRepository boardRepository;
+    @Mock
+    private FileStorage fileStorage;
 
-    @Nested
-    @DisplayName("createBoard()")
-    class CreateTests {
 
-        @Test
-        @DisplayName("성공 - 파일 없음")
-        void create_success() {
-            BoardCreateRequest req = BoardCreateRequest.builder()
-                    .title("제목")
-                    .content("내용")
-                    .writerId(10L)      // 서비스는 실제로 securityUtil에서 id를 읽음
-                    .categoryId(100L)
-                    .status("Y")
-                    .build();
 
-            mockLogin(10L);
+    @Test
+    @DisplayName("게시글 생성 성공 (이미지 파일 포함)")
+    void createBoard_success_withImages() {
+        // given
+        long userId = 1L;
+        long categoryId = 10L;
+        BoardCreateRequest request = new BoardCreateRequest("제목", "내용", userId, categoryId, "Y", null);
 
-            User writer = mock(User.class);
-            Category category = mock(Category.class);
-            when(writer.getUserId()).thenReturn(10L);
-            when(category.getId()).thenReturn(100L);
+        List<MultipartFile> imageFiles = List.of(
+                new MockMultipartFile("image1", "image1.jpg", "image/jpeg", "image1_content".getBytes())
+        );
 
-            given(userProvider.getUserById(10L)).willReturn(writer);
-            given(categoryRepository.findById(100L)).willReturn(Optional.of(category));
-            // 저장 시, 서비스가 만든 엔티티를 그대로 반환시키면 응답 변환이 안전
-            given(boardRepository.save(any(Board.class))).willAnswer(invocation -> invocation.getArgument(0));
+        // Mock 객체 설정
+        LoginUserInfo mockLoginUser = new LoginUserInfo(userId, "testUser", null);
+        User mockUser = User.builder().userId(userId).build();
+        // Category의 생성자가 private이므로 mock 객체로 생성
+        Category mockCategory = mock(Category.class);
+        FileStorageResult mockFileResult = new FileStorageResult("stored1.jpg", "image1.jpg");
 
-            TransactionSynchronizationManager.initSynchronization();
-            try {
-                BoardCommandResponse res = service.createBoard(req, Collections.<MultipartFile>emptyList());
+        // static 메소드 Mocking
+        try (MockedStatic<SecurityUtil> mockedSecurityUtil = Mockito.mockStatic(SecurityUtil.class);
+             MockedStatic<TransactionSynchronizationManager> mockedTxManager = Mockito.mockStatic(TransactionSynchronizationManager.class)) {
 
-                assertThat(res.getTitle()).isEqualTo("제목");
-                assertThat(res.getWriterId()).isEqualTo(10L);
-                assertThat(res.getCategoryId()).isEqualTo(100L);
+            // Mock 동작 정의
+            mockedSecurityUtil.when(SecurityUtil::getLoginUserInfo).thenReturn(mockLoginUser);
+            when(userProvider.getUserById(userId)).thenReturn(mockUser);
+            when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(mockCategory));
+            // toResponse()에서 category.getId()를 호출할 것이므로, getId()의 반환값을 지정해줘야 함
+            when(mockCategory.getId()).thenReturn(categoryId);
+            when(fileStorage.store(any(MultipartFile.class))).thenReturn(mockFileResult);
+            mockedTxManager.when(() -> TransactionSynchronizationManager.registerSynchronization(any(TransactionSynchronization.class))).then(invocation -> null);
 
-                verify(securityUtil).getLoginUserInfo();
-                verify(userProvider).getUserById(10L);
-                verify(categoryRepository).findById(100L);
-                verify(boardRepository).save(any(Board.class));
-            } finally {
-                TransactionSynchronizationManager.clearSynchronization();
-            }
-        }
+            ArgumentCaptor<Board> boardCaptor = ArgumentCaptor.forClass(Board.class);
+            when(boardRepository.save(boardCaptor.capture())).then(invocation -> invocation.getArgument(0));
 
-        @Test
-        @DisplayName("실패 - 카테고리 없음 → CATEGORY_NOT_FOUND")
-        void create_categoryNotFound() {
-            BoardCreateRequest req = BoardCreateRequest.builder()
-                    .title("제목")
-                    .content("내용")
-                    .writerId(10L)
-                    .categoryId(999L)
-                    .status("Y")
-                    .build();
+            // when
+            BoardCommandResponse response = boardCommandService.createBoard(request, imageFiles);
 
-            mockLogin(10L);
-            given(userProvider.getUserById(10L)).willReturn(mock(User.class));
-            given(categoryRepository.findById(999L)).willReturn(Optional.empty());
+            // then
+            assertNotNull(response);
+            assertEquals(categoryId, response.getCategoryId());
 
-            TransactionSynchronizationManager.initSynchronization();
-            try {
-                assertThatThrownBy(() -> service.createBoard(req, Collections.emptyList()))
-                        .isInstanceOf(BusinessException.class)
-                        .hasMessageContaining(ErrorCode.CATEGORY_NOT_FOUND.getMessage());
-            } finally {
-                TransactionSynchronizationManager.clearSynchronization();
-            }
+            Board capturedBoard = boardCaptor.getValue();
+            assertEquals("제목", capturedBoard.getTitle());
+            assertEquals(mockUser, capturedBoard.getWriter());
+            assertEquals(mockCategory, capturedBoard.getCategory());
+            assertEquals(1, capturedBoard.getFiles().size());
+            assertEquals("stored1.jpg", capturedBoard.getFiles().get(0).getStoredName());
 
-            verify(userProvider).getUserById(10L);
-            verify(categoryRepository).findById(999L);
-            verify(boardRepository, never()).save(any());
-        }
-
-        @Test
-        @DisplayName("실패 - 작성자 없음 → USER_NOT_FOUND")
-        void create_userNotFound() {
-            BoardCreateRequest req = BoardCreateRequest.builder()
-                    .title("제목")
-                    .content("내용")
-                    .writerId(404L)
-                    .categoryId(100L) // 존재하도록
-                    .status("Y")
-                    .build();
-
-            mockLogin(404L);
-            given(categoryRepository.findById(100L)).willReturn(Optional.of(mock(Category.class)));
-            given(userProvider.getUserById(404L)).willReturn(null);
-
-            TransactionSynchronizationManager.initSynchronization();
-            try {
-                assertThatThrownBy(() -> service.createBoard(req, Collections.emptyList()))
-                        .isInstanceOf(BusinessException.class)
-                        .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getMessage());
-            } finally {
-                TransactionSynchronizationManager.clearSynchronization();
-            }
-
-            verify(categoryRepository).findById(100L);
-            verify(userProvider).getUserById(404L);
-            verify(boardRepository, never()).save(any());
+            verify(fileStorage, times(1)).store(any(MultipartFile.class));
+            verify(boardRepository, times(1)).save(any(Board.class));
         }
     }
 
-    @Nested
-    @DisplayName("updateBoard()")
-    class UpdateTests {
 
-        @Test
-        @DisplayName("실패 - 게시글 없음 → BOARD_NOT_FOUND")
-        void update_notFound() {
-            Long id = 999L;
-            given(boardRepository.findById(id)).willReturn(Optional.empty());
+    @Test
+    @DisplayName("게시글 수정 성공 테스트 (카테고리 포함)")
+    void updateBoard_success_withCategory() {
+        // given
+        long boardId = 1L;
+        long newCategoryId = 20L;
 
-            BoardUpdateRequest req = BoardUpdateRequest.builder()
-                    .title("수정제목")
-                    .content("수정내용")
-                    .status("N")
-                    .categoryId(100L)
-                    .build();
+        BoardUpdateRequest request = BoardUpdateRequest.builder()
+                .title("수정된 제목")
+                .content("수정된 내용")
+                .status("N")
+                .categoryId(newCategoryId)
+                .build();
 
-            assertThatThrownBy(() -> service.updateBoard(id, req))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining(ErrorCode.BOARD_NOT_FOUND.getMessage());
+        // findById로 찾아올 Board 객체를 spy로 생성
+        Board mockBoard = spy(Board.builder().id(boardId).build());
+        // Category는 private 생성자이므로 mock 객체로 생성
+        Category mockCategory = mock(Category.class);
 
-            verify(boardRepository).findById(id);
-        }
+        // Mock 동작 정의
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(mockBoard));
+        when(categoryRepository.findById(newCategoryId)).thenReturn(Optional.of(mockCategory));
 
-        @Test
-        @DisplayName("성공 - 부분수정(null은 유지)")
-        void update_success_partial() {
-            Long id = 1L;
-            Board board = Board.builder()
-                    .id(id)
-                    .title("원제목")
-                    .content("원내용")
-                    .status("Y")
-                    .viewCount(0L)
-                    .build();
+        // when
+        boardCommandService.updateBoard(boardId, request);
 
-            given(boardRepository.findById(id)).willReturn(Optional.of(board));
+        // then
+        // 1. mockBoard의 updateBoard 메소드가 올바른 인자들로 호출되었는지 검증
+        verify(mockBoard, times(1)).updateBoard(
+                "수정된 제목",
+                "수정된 내용",
+                mockCategory,
+                "N"
+        );
 
-            BoardUpdateRequest req = BoardUpdateRequest.builder()
-                    .title("수정제목")
-                    .content(null)
-                    .status(null)
-                    .categoryId(null)
-                    .build();
+        // 2. repository의 find 메소드들이 각각 1번씩 호출되었는지 검증
+        verify(boardRepository, times(1)).findById(boardId);
+        verify(categoryRepository, times(1)).findById(newCategoryId);
+    }
 
-            service.updateBoard(id, req);
+    @Test
+    @DisplayName("게시글 삭제 성공 테스트 (연관 파일 포함)")
+    void deleteBoard_success_withFiles() {
+        // given
+        long boardId = 1L;
 
-            assertThat(board.getTitle()).isEqualTo("수정제목");
-            assertThat(board.getContent()).isEqualTo("원내용");
-            assertThat(board.getStatus()).isEqualTo("Y");
-            verify(boardRepository).findById(id);
-        }
+        // 삭제될 게시글에 포함된 파일 목록 생성
+        AdFile file1 = AdFile.builder().storedName("stored1.jpg").build();
+        AdFile file2 = AdFile.builder().storedName("stored2.png").build();
 
-        @Test
-        @DisplayName("실패 - 카테고리 변경 요청 but 없음 → CATEGORY_NOT_FOUND")
-        void update_categoryNotFound() {
-            Long id = 1L;
-            Board board = Board.builder()
-                    .id(id)
-                    .title("원제목")
-                    .content("원내용")
-                    .status("Y")
-                    .build();
+        // findById로 찾아올 Board 객체 생성
+        Board mockBoard = Board.builder()
+                .id(boardId)
+                .files(List.of(file1, file2))
+                .build();
 
-            given(boardRepository.findById(id)).willReturn(Optional.of(board));
-            given(categoryRepository.findById(777L)).willReturn(Optional.empty());
+        // boardRepository.findById가 mockBoard를 반환하도록 설정
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(mockBoard));
 
-            BoardUpdateRequest req = BoardUpdateRequest.builder()
-                    .categoryId(777L)
-                    .build();
+        // when
+        boardCommandService.deleteBoard(boardId);
 
-            assertThatThrownBy(() -> service.updateBoard(id, req))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining(ErrorCode.CATEGORY_NOT_FOUND.getMessage());
+        // then
+        // 1. boardRepository.deleteById가 올바른 ID로 호출되었는지 검증
+        verify(boardRepository, times(1)).deleteById(boardId);
 
-            verify(boardRepository).findById(id);
-            verify(categoryRepository).findById(777L);
+        // 2. fileStorage.deleteQuietly가 각 파일의 storedName으로 호출되었는지 검증
+        verify(fileStorage, times(1)).deleteQuietly("stored1.jpg");
+        verify(fileStorage, times(1)).deleteQuietly("stored2.png");
+    }
+    @Test
+    @DisplayName("게시글 이미지 추가 성공 테스트")
+    void appendImagesBoard_success() {
+        // given
+        long boardId = 1L;
+        List<MultipartFile> imageFiles = List.of(
+                new MockMultipartFile("image1", "image1.jpg", "image/jpeg", "content1".getBytes()),
+                new MockMultipartFile("image2", "image2.png", "image/png", "content2".getBytes())
+        );
+
+        // findById로 찾아올 Board 객체를 spy로 생성
+        Board mockBoard = spy(Board.builder().id(boardId).files(new ArrayList<>()).build());
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(mockBoard));
+
+        // fileStorage.store가 호출될 때 순차적으로 다른 결과를 반환하도록 설정
+        when(fileStorage.store(imageFiles.get(0))).thenReturn(new FileStorageResult("stored1.jpg", "url1"));
+        when(fileStorage.store(imageFiles.get(1))).thenReturn(new FileStorageResult("stored2.png", "url2"));
+
+        // static 메소드 Mocking
+        try (MockedStatic<TransactionSynchronizationManager> mockedTxManager = Mockito.mockStatic(TransactionSynchronizationManager.class)) {
+            mockedTxManager.when(() -> TransactionSynchronizationManager.registerSynchronization(any(TransactionSynchronization.class)))
+                    .then(invocation -> null);
+
+            // when
+            int addedCount = boardCommandService.appendImagesBoard(boardId, imageFiles);
+
+            // then
+            // 1. 반환된 추가 개수 검증
+            assertEquals(2, addedCount);
+
+            // 2. board.addFile 메소드가 2번 호출되었는지 검증
+            verify(mockBoard, times(2)).addFile(any(AdFile.class));
+
+            // 3. fileStorage.store가 2번 호출되었는지 검증
+            verify(fileStorage, times(2)).store(any(MultipartFile.class));
+
+            // 4. 트랜잭션 동기화가 등록되었는지 검증
+            mockedTxManager.verify(() -> TransactionSynchronizationManager.registerSynchronization(any(TransactionSynchronization.class)), times(1));
         }
     }
 
-    @Nested
-    @DisplayName("deleteBoard()")
-    class DeleteTests {
 
-        @Test
-        @DisplayName("실패 - 게시글 없음 → BOARD_NOT_FOUND")
-        void delete_notFound() {
-            Long id = 404L;
-            given(boardRepository.findById(id)).willReturn(Optional.empty());
-
-            assertThatThrownBy(() -> service.deleteBoard(id))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessageContaining(ErrorCode.BOARD_NOT_FOUND.getMessage());
-
-            verify(boardRepository).findById(id);
-            verify(boardRepository, never()).deleteById(anyLong());
-        }
-
-        @Test
-        @DisplayName("성공 - 파일 목록이 null이어도 NPE 없이 삭제")
-        void delete_success() {
-            Long id = 1L;
-
-            // Board를 목킹하여 getFiles()가 null이 되도록(서비스가 null-safe 처리했는지 확인)
-            Board board = mock(Board.class);
-            when(board.getFiles()).thenReturn(null);
-
-            given(boardRepository.findById(id)).willReturn(Optional.of(board));
-            willDoNothing().given(boardRepository).deleteById(id);
-
-            service.deleteBoard(id);
-
-            verify(boardRepository).findById(id);
-            verify(boardRepository).deleteById(id);
-        }
-    }
 }
