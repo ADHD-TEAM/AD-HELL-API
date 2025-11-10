@@ -4,11 +4,13 @@ import com.adhd.ad_hell.common.storage.FileStorage;
 import com.adhd.ad_hell.common.storage.FileStorageResult;
 import com.adhd.ad_hell.common.util.SecurityUtil;
 import com.adhd.ad_hell.domain.advertise.command.application.dto.request.AdCreateRequest;
+import com.adhd.ad_hell.domain.advertise.command.application.dto.request.AdLikeRequest;
 import com.adhd.ad_hell.domain.advertise.command.application.dto.request.AdUpdateRequest;
-import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.Ad;
-import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.AdFile;
-import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.FileType;
+import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.*;
+import com.adhd.ad_hell.domain.advertise.command.domain.repository.AdLikeRepository;
 import com.adhd.ad_hell.domain.advertise.command.domain.repository.AdRepository;
+import com.adhd.ad_hell.domain.user.command.entity.User;
+import com.adhd.ad_hell.domain.user.command.repository.UserCommandRepository;
 import com.adhd.ad_hell.exception.BusinessException;
 import com.adhd.ad_hell.exception.ErrorCode;
 import java.util.ArrayList;
@@ -25,8 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class AdCommandService {
 
     private final AdRepository adRepository;
+    private final AdLikeRepository adLikeRepository;
     private final FileStorage fileStorage;
     private final SecurityUtil securityUtil;
+    private final UserCommandRepository userCommandRepository;
 
     @Transactional
     public Long createAd(AdCreateRequest req, List<MultipartFile> videoFiles) {
@@ -76,5 +80,21 @@ public class AdCommandService {
         adRepository.deleteById(adId);
 
         ad.getFiles().forEach(file -> fileStorage.deleteQuietly(file.getStoredName()));
+    }
+
+    @Transactional
+    public void toggleLike(Ad ad, Long userId) {
+
+        User user = userCommandRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        AdLikeId id = new AdLikeId(ad.getAdId(), userId);
+
+        if (adLikeRepository.findById(id).isPresent()) {
+            adLikeRepository.deleteById(id);
+        } else {
+            AdLike adLike = new AdLike(ad, user);
+            adLikeRepository.save(adLike);
+        }
     }
 }

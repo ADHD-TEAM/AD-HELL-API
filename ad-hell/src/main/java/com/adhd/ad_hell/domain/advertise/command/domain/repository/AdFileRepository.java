@@ -10,6 +10,4 @@ public interface AdFileRepository {
     List<AdFile> findByAd_AdId(Long adId);
     Optional<AdFile> findById(Long fileId);
     void deleteById(Long fileId);
-
-
 }

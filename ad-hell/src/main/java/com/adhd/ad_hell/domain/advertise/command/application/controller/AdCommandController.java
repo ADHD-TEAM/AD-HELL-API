@@ -1,9 +1,17 @@
 package com.adhd.ad_hell.domain.advertise.command.application.controller;
 
 import com.adhd.ad_hell.common.dto.ApiResponse;
+import com.adhd.ad_hell.common.util.SecurityUtil;
 import com.adhd.ad_hell.domain.advertise.command.application.dto.request.AdCreateRequest;
 import com.adhd.ad_hell.domain.advertise.command.application.dto.request.AdUpdateRequest;
 import com.adhd.ad_hell.domain.advertise.command.application.service.AdCommandService;
+import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.Ad;
+import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.AdLike;
+import com.adhd.ad_hell.domain.advertise.command.domain.repository.AdRepository;
+import com.adhd.ad_hell.domain.user.command.entity.User;
+import com.adhd.ad_hell.domain.user.command.repository.UserCommandRepository;
+import com.adhd.ad_hell.exception.BusinessException;
+import com.adhd.ad_hell.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -14,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 // ... existing code ...
 
 import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -23,6 +33,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class AdCommandController {
 
     private final AdCommandService adCommandService;
+    private final AdRepository adRepository;
+    private final SecurityUtil securityUtil;
 
     @Operation(summary = "광고 등록", description = "광고를 등록하고 영상 파일을 함께 업로드한다.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -50,6 +62,18 @@ public class AdCommandController {
     public ResponseEntity<Map<String, Object>> deleteAd(@PathVariable Long adId) {
         adCommandService.deleteAd(adId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{adId}/likes/toggle")
+    public ResponseEntity<Void> toggleLike(
+            @PathVariable Long adId) {
+
+        Ad ad = adRepository.findById(adId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.AD_NOT_FOUND));
+        Long userId = securityUtil.getLoginUserInfo().getUserId();
+
+        adCommandService.toggleLike(ad, userId);
+        return ResponseEntity.ok().build();
     }
 
 }

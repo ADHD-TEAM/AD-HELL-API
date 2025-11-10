@@ -10,6 +10,4 @@ public interface FileStorage {
     void delete(String fileName);
     /* 트랜잭션 보상 처리 */
     void deleteQuietly(String fileName);
-
-
 }
