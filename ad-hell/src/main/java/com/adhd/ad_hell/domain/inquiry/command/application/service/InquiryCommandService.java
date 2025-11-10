@@ -8,7 +8,6 @@ import com.adhd.ad_hell.domain.inquiry.command.application.dto.request.InquiryAn
 
 import com.adhd.ad_hell.domain.inquiry.command.domain.repository.InquiryRepository;
 import com.adhd.ad_hell.domain.user.command.entity.User;
-import com.adhd.ad_hell.domain.user.command.repository.UserCommandRepository;
 import com.adhd.ad_hell.domain.user.query.service.provider.UserProvider;
 import com.adhd.ad_hell.exception.BusinessException;
 import com.adhd.ad_hell.exception.ErrorCode;
@@ -26,15 +25,12 @@ public class InquiryCommandService {
 
     private final InquiryRepository inquiryRepository;
     private final CategoryRepository categoryRepository;
-    private final SecurityUtil securityUtil;
     private final UserProvider userProvider;
 
     /** 문의 등록 (Builder 사용) */
     @Transactional
     public Long createInquiry(InquiryCreateRequest req) {
-//        User user = userCommandRepository.findById(req.getUserId())
-//                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        Long userId = securityUtil.getLoginUserInfo().getUserId();
+        Long userId = SecurityUtil.getLoginUserInfo().getUserId();
         User user = userProvider.getUserById(userId);
 
         Category category = categoryRepository.findById(req.getCategoryId())
