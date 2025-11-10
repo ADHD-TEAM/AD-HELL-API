@@ -29,6 +29,7 @@ public class LocalFileStorageService implements FileStorage {
     private final Path uploadDir;
 
     public LocalFileStorageService(@Value("${file.file-dir}") String uploadDir) {
+
         this.uploadDir = Paths.get(uploadDir).normalize().toAbsolutePath();
 
         try {
@@ -43,6 +44,7 @@ public class LocalFileStorageService implements FileStorage {
      * 파일 저장
      * @return FileStorageResult (저장된 이름 + 절대경로)
      */
+
     @Override
     public FileStorageResult store(MultipartFile file) {
         if (file == null || file.isEmpty())
