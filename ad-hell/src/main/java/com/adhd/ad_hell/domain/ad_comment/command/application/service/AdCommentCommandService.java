@@ -4,6 +4,10 @@ import com.adhd.ad_hell.domain.ad_comment.command.application.dto.request.AdComm
 import com.adhd.ad_hell.domain.ad_comment.command.application.dto.request.AdCommentUpdateRequest;
 import com.adhd.ad_hell.domain.ad_comment.command.domain.aggregate.AdComment;
 import com.adhd.ad_hell.domain.ad_comment.command.domain.repository.AdCommentRepository;
+import com.adhd.ad_hell.domain.advertise.command.domain.aggregate.Ad;
+import com.adhd.ad_hell.domain.advertise.command.domain.repository.AdRepository;
+import com.adhd.ad_hell.exception.BusinessException;
+import com.adhd.ad_hell.exception.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdCommentCommandService {
 
     private final AdCommentRepository adCommentRepository;
+    private final AdRepository adRepository;
 
     /* 광고 댓글 등록 */
     @Transactional
@@ -24,7 +29,12 @@ public class AdCommentCommandService {
                 .content(req.getContent())
                 .build();
 
-        AdComment saved = adCommentRepository.save(newComment);
+        Ad ad = adRepository.findById(req.getAdId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.AD_NOT_FOUND));
+
+        ad.increaseCommentCount();
+
+        adCommentRepository.save(newComment);
     }
 
 
@@ -40,9 +50,14 @@ public class AdCommentCommandService {
     /* 광고 댓글 삭제 */
     @Transactional
     public void deleteAdComment(Long adCommentId) {
-        if (!adCommentRepository.existsById(adCommentId)) {
-            throw new EntityNotFoundException("AdComment not found: " + adCommentId);
-        }
+        AdComment comment = adCommentRepository.findById(adCommentId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND));
+
+        Ad ad = adRepository.findById(comment.getAdId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.AD_NOT_FOUND));
+
+        ad.decreaseCommentCount();
+
         adCommentRepository.deleteById(adCommentId);
     }
 }

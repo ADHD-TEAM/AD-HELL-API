@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "ad_comment")
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class AdComment extends BaseTimeEntity {
 
     @Id
@@ -34,4 +32,5 @@ public class AdComment extends BaseTimeEntity {
         this.adId = adId;
         this.content = content;
     }
+
 }

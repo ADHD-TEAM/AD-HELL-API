@@ -68,11 +68,9 @@ public class AdCommandController {
     public ResponseEntity<Void> toggleLike(
             @PathVariable Long adId) {
 
-        Ad ad = adRepository.findById(adId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.AD_NOT_FOUND));
         Long userId = securityUtil.getLoginUserInfo().getUserId();
 
-        adCommandService.toggleLike(ad, userId);
+        adCommandService.toggleLike(adId, userId);
         return ResponseEntity.ok().build();
     }
 
