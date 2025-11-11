@@ -56,6 +56,22 @@ public class Ad extends BaseTimeEntity {
         file.setAd(null);           // <- 양방향 일관성 + 고아 설정
     }
 
+    public void increaseLikeCount() {
+        this.like_count++;
+    }
+
+    public void decreaseLikeCount() {
+        if (this.like_count > 0) this.like_count--;
+    }
+
+    public void increaseCommentCount() {
+        this.comment_count++;
+    }
+
+    public void decreaseCommentCount() {
+        if (this.comment_count > 0) this.comment_count--;
+    }
+
     public void clearFiles() {
         for (AdFile f : new ArrayList<>(files)) {
             removeFile(f);          // removeFile 사용(양쪽 끊기)

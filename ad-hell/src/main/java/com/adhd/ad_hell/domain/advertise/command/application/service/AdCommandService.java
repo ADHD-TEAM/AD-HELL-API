@@ -83,7 +83,10 @@ public class AdCommandService {
     }
 
     @Transactional
-    public void toggleLike(Ad ad, Long userId) {
+    public void toggleLike(Long adId, Long userId) {
+
+        Ad ad = adRepository.findById(adId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.AD_NOT_FOUND));
 
         User user = userCommandRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
@@ -92,9 +95,11 @@ public class AdCommandService {
 
         if (adLikeRepository.findById(id).isPresent()) {
             adLikeRepository.deleteById(id);
+            ad.decreaseLikeCount();
         } else {
             AdLike adLike = new AdLike(ad, user);
             adLikeRepository.save(adLike);
+            ad.increaseLikeCount();
         }
     }
 }
