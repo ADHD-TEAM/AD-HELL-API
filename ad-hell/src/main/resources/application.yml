@@ -73,5 +73,8 @@ server:
   port: 8088                      # ?? ??
 
 file:
+  image-dir: "C:/Users/Playdata/ad-hell/uploads/images"
+  video-dir: "C:/Users/Playdata/ad-hell/uploads/videos"
+  doc-dir: "C:/Users/Playdata/ad-hell/uploads/docs"
   file-dir: "C:/Users/Playdata/ad-hell/uploads"
   base-url: "http://localhost:8080/api/files/"
