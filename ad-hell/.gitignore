@@ -42,3 +42,4 @@ nbdist/
 # 환경변수 파일
 /env
 .env
+./src/main/resources/application.yml

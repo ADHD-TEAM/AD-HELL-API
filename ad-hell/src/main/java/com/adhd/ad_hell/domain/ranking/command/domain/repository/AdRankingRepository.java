@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface AdRankingRepository {
     AdRank save(AdRank adRank);
     Optional<AdRank> findById(Long rankingId);
-
+    // 전체 삭제 (배치)
+    void deleteAllInBatch();
 }
