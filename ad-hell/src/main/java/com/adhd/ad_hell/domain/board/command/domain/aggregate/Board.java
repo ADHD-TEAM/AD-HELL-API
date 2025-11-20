@@ -51,8 +51,8 @@ public class Board extends BaseTimeEntity {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AdFile> files = new ArrayList<>();
 
-    // --- 비즈니스 ---
-    public void increaseViewCount() { this.viewCount = (viewCount == null ? 0L : viewCount) + 1; }
+
+    // public void increaseViewCount() { this.viewCount = (viewCount == null ? 0L : viewCount) + 1; }
 
     public void updateBoard(String title, String content, Category category, String status) {
         if (title != null) this.title = title;

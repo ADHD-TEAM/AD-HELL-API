@@ -12,11 +12,11 @@
         SELECT
         a.announcement_id AS id,
         a.title           AS title,
-        u.name            AS writerName,
+        u.nickname        AS writerName,
         a.status          AS status,
         a.created_at      AS createdAt
         FROM announcement a
-        JOIN user u ON u.user_id = a.user_id
+        JOIN user_info u ON u.user_id = a.user_id
         <where>
             <if test="request.keyword != null and request.keyword.trim() != ''">
                 AND (
@@ -29,7 +29,7 @@
             </if>
         </where>
         ORDER BY a.created_at DESC, a.announcement_id DESC
-        LIMIT #{request.sizeOrDefault()} OFFSET #{request.offset()}
+        LIMIT #{request.limit} OFFSET #{request.offset}
     </select>
 
     <!-- 총 개수 -->
@@ -59,12 +59,12 @@
             a.announcement_id AS id,
             a.title           AS title,
             a.content         AS content,
-            u.name            AS writerName,
+            u.nickname        AS writerName,
             a.status          AS status,
             a.created_at      AS createdAt,
             a.updated_at      AS updatedAt
         FROM announcement a
-                 JOIN user u ON u.user_id = a.user_id
+                 JOIN user_info u ON u.user_id = a.user_id
         WHERE a.announcement_id = #{announcementId}
             LIMIT 1
     </select>

@@ -26,7 +26,7 @@ public class BoardComment extends BaseTimeEntity {
     // 회원 FK
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private User writer;
 
     // 게시판 FK
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -40,7 +40,7 @@ public class BoardComment extends BaseTimeEntity {
 
     // 수정
     public void updateContent(String newContent, Long requestUserId) {
-        if (!this.user.getUserId().equals(requestUserId)) {
+        if (!this.writer.getUserId().equals(requestUserId)) {
             throw new SecurityException("본인 댓글만 수정할 수 있습니다.");
         }
         this.content = newContent;
@@ -48,7 +48,7 @@ public class BoardComment extends BaseTimeEntity {
 
     // 삭제 권한 검증
     public void assertOwner(Long requestUserId) {
-        if (!this.user.getUserId().equals(requestUserId)) {
+        if (!this.writer.getUserId().equals(requestUserId)) {
             throw new SecurityException("본인 댓글만 삭제할 수 있습니다.");
         }
     }

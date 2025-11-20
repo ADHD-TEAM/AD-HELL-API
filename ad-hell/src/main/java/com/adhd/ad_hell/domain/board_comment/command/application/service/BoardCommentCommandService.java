@@ -38,7 +38,7 @@ public class BoardCommentCommandService {
 
         // 댓글 생성
         BoardComment comment = BoardComment.builder()
-                .user(user)
+                .writer(user)
                 .board(board)
                 .content(req.getContent())
                 .build();
@@ -47,7 +47,7 @@ public class BoardCommentCommandService {
 
         return BoardCommentCommandResponse.builder()
                 .id(saved.getId())
-                .writerId(saved.getUser().getUserId())
+                .writerId(saved.getWriter().getUserId())
                 .boardId(saved.getBoard().getId())
                 .content(saved.getContent())
                 .createdAt(saved.getCreatedAt())
@@ -66,7 +66,7 @@ public class BoardCommentCommandService {
 
         return BoardCommentCommandResponse.builder()
                 .id(comment.getId())
-                .writerId(comment.getUser().getUserId())
+                .writerId(comment.getWriter().getUserId())
                 .boardId(comment.getBoard().getId())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())

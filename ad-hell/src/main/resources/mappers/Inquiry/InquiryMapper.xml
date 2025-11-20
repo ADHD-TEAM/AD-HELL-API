@@ -12,8 +12,8 @@
         c.name AS categoryName,
         i.title AS title,
         CASE
-            WHEN CHAR_LENGTH(i.contents) &lt;= 100 THEN i.contents
-            ELSE CONCAT(SUBSTRING(i.contents, 1, 100), '...')
+            WHEN CHAR_LENGTH(i.content) &lt;= 100 THEN i.content
+            ELSE CONCAT(SUBSTRING(i.content, 1, 100), '...')
         END AS contentsSnippet,
         CASE WHEN i.response IS NULL OR TRIM(i.response) = '' THEN 'N' ELSE 'Y' END AS answered,
         i.answered_at AS answeredAt,
@@ -26,7 +26,7 @@
         i.category_id AS categoryId,
         c.name AS categoryName,
         i.title AS title,
-        i.contents AS contents,
+        i.content AS content,
         i.response AS response,
         CASE WHEN i.response IS NULL OR TRIM(i.response) = '' THEN 'N' ELSE 'Y' END AS answered,
         i.answered_at AS answeredAt,
@@ -38,41 +38,34 @@
         JOIN category c ON c.id = i.category_id
     </sql>
 
-    <!-- 공통 필터: 앞에 WHERE가 있으면 AND로, 없으면 각 쿼리에서 WHERE 1=1 후 포함 -->
     <sql id="commonFilters">
         <trim prefix="AND" prefixOverrides="AND |OR ">
-            <if test="req.categoryId != null">
-                AND i.category_id = #{req.categoryId}
-            </if>
             <if test="req.keyword != null and req.keyword != ''">
                 AND (
                 LOWER(i.title) LIKE CONCAT('%', LOWER(#{req.keyword}), '%')
-                OR LOWER(i.contents) LIKE CONCAT('%', LOWER(#{req.keyword}), '%')
+                OR LOWER(i.content) LIKE CONCAT('%', LOWER(#{req.keyword}), '%')
                 )
             </if>
-            <choose>
-                <when test="req.answeredSafe == 'Y'">
-                    AND i.response IS NOT NULL AND TRIM(i.response) &lt;&gt; ''
-                </when>
-                <when test="req.answeredSafe == 'N'">
-                    AND (i.response IS NULL OR TRIM(i.response) = '')
-                </when>
-            </choose>
+            <if test="req.answered != null and req.answered != ''">
+                <choose>
+                    <when test="req.answered == 'Y'">
+                        AND i.response IS NOT NULL AND TRIM(i.response) &lt;&gt; ''
+                    </when>
+                    <when test="req.answered == 'N'">
+                        AND (i.response IS NULL OR TRIM(i.response) = '')
+                    </when>
+                </choose>
+            </if>
         </trim>
     </sql>
 
     <sql id="orderBy">
-        ORDER BY
-        <choose>
-            <when test="req.sortBySafe == 'answeredAt'"> i.answered_at </when>
-            <when test="req.sortBySafe == 'title'"> i.title </when>
-            <otherwise> i.created_at </otherwise>
-        </choose>
-        ${req.directionSafe}
+        ORDER BY i.created_at DESC
     </sql>
 
-    <!-- 회원 목록 -->
-    <select id="findMyInquiries" resultType="com.adhd.ad_hell.domain.inquiry.query.dto.response.InquirySummaryResponse">
+    <!-- 회원 -->
+    <select id="findMyInquiries"
+            resultType="com.adhd.ad_hell.domain.inquiry.query.dto.response.InquirySummaryResponse">
         SELECT <include refid="summaryColumns"/>
         <include refid="fromJoin"/>
         WHERE i.user_id = #{req.userId}
@@ -81,22 +74,25 @@
         LIMIT #{req.size} OFFSET #{req.offset}
     </select>
 
-    <select id="countMyInquiries" resultType="int">
+    <select id="countMyInquiries" resultType="long">
         SELECT COUNT(1)
         <include refid="fromJoin"/>
         WHERE i.user_id = #{req.userId}
         <include refid="commonFilters"/>
     </select>
 
-    <select id="findMyInquiryById" resultType="com.adhd.ad_hell.domain.inquiry.query.dto.response.InquiryDetailResponse">
+    <select id="findMyInquiryById"
+            resultType="com.adhd.ad_hell.domain.inquiry.query.dto.response.InquiryDetailResponse">
         SELECT <include refid="detailColumns"/>
         <include refid="fromJoin"/>
-        WHERE i.inquiry_id = #{id} AND i.user_id = #{userId}
+        WHERE i.inquiry_id = #{id}
+        AND i.user_id   = #{userId}
         LIMIT 1
     </select>
 
     <!-- 관리자 -->
-    <select id="findAdminInquiries" resultType="com.adhd.ad_hell.domain.inquiry.query.dto.response.InquirySummaryResponse">
+    <select id="findAdminInquiries"
+            resultType="com.adhd.ad_hell.domain.inquiry.query.dto.response.InquirySummaryResponse">
         SELECT <include refid="summaryColumns"/>
         <include refid="fromJoin"/>
         WHERE 1=1
@@ -105,17 +101,19 @@
         LIMIT #{req.size} OFFSET #{req.offset}
     </select>
 
-    <select id="countAdminInquiries" resultType="int">
+    <select id="countAdminInquiries" resultType="long">
         SELECT COUNT(1)
         <include refid="fromJoin"/>
         WHERE 1=1
         <include refid="commonFilters"/>
     </select>
 
-    <select id="findAdminInquiryById" resultType="com.adhd.ad_hell.domain.inquiry.query.dto.response.InquiryDetailResponse">
+    <select id="findAdminInquiryById"
+            resultType="com.adhd.ad_hell.domain.inquiry.query.dto.response.InquiryDetailResponse">
         SELECT <include refid="detailColumns"/>
         <include refid="fromJoin"/>
         WHERE i.inquiry_id = #{id}
         LIMIT 1
     </select>
+
 </mapper>

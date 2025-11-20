@@ -83,8 +83,10 @@
 
         <where>
             <if test="request.keyword != null and request.keyword != ''">
-                AND (LOWER(b.board_title)   LIKE CONCAT('%', LOWER(#{request.keyword}), '%')
-                OR  LOWER(b.board_content) LIKE CONCAT('%', LOWER(#{request.keyword}), '%'))
+                AND (
+                LOWER(b.board_title)   LIKE CONCAT('%', LOWER(#{request.keyword}), '%')
+                OR LOWER(b.board_content) LIKE CONCAT('%', LOWER(#{request.keyword}), '%')
+                )
             </if>
             <if test="request.status != null and request.status != ''">
                 AND b.board_status = #{request.status}
@@ -107,8 +109,12 @@
         </choose>
 
         <choose>
-            <when test="request.direction != null and request.direction.toUpperCase() == 'ASC'">ASC</when>
-            <otherwise>DESC</otherwise>
+            <when test="request.direction != null and request.direction.toUpperCase() == 'ASC'">
+                ASC
+            </when>
+            <otherwise>
+                DESC
+            </otherwise>
         </choose>
 
         LIMIT #{request.limit} OFFSET #{request.offset}
@@ -116,20 +122,22 @@
 
     <!-- 총 개수 -->
     <select id="countAllBoards"
-            parameterType="com.adhd.ad_hell.domain.board.query.dto.request.BoardSearchRequest"
+            parameterType="map"
             resultType="long">
         SELECT COUNT(1)
         FROM board b
         <where>
-            <if test="keyword != null and keyword != ''">
-                AND (LOWER(b.board_title)   LIKE CONCAT('%', LOWER(#{keyword}), '%')
-                OR  LOWER(b.board_content) LIKE CONCAT('%', LOWER(#{keyword}), '%'))
+            <if test="request.keyword != null and request.keyword != ''">
+                AND (
+                LOWER(b.board_title)   LIKE CONCAT('%', LOWER(#{request.keyword}), '%')
+                OR LOWER(b.board_content) LIKE CONCAT('%', LOWER(#{request.keyword}), '%')
+                )
             </if>
-            <if test="status != null and status != ''">
-                AND b.board_status = #{status}
+            <if test="request.status != null and request.status != ''">
+                AND b.board_status = #{request.status}
             </if>
-            <if test="categoryId != null">
-                AND b.category_id = #{categoryId}
+            <if test="request.categoryId != null">
+                AND b.category_id = #{request.categoryId}
             </if>
         </where>
     </select>

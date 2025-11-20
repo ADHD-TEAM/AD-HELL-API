@@ -2,6 +2,7 @@ package com.adhd.ad_hell.domain.inquiry.query.dto.request;
 
 import lombok.*;
 
+@Setter
 @Getter
 @Builder
 @NoArgsConstructor
