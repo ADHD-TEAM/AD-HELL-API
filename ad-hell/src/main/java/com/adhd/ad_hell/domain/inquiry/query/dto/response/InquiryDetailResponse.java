@@ -14,7 +14,7 @@ public class InquiryDetailResponse {
     private Long categoryId;
     private String categoryName;
     private String title;
-    private String contents;
+    private String content;
     private String response;
     private String answered;
     private LocalDateTime answeredAt;

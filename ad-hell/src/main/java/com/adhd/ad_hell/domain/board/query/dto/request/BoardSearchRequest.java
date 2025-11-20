@@ -14,7 +14,7 @@ public class BoardSearchRequest {
 
     // 페이징
     private Integer page = 1;
-    private Integer size = 10;
+    private Integer size = 20;
 
     // 검색 조건
     private Long categoryId;

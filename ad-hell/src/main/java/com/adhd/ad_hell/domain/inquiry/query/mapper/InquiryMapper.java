@@ -13,11 +13,11 @@ public interface InquiryMapper {
 
     // 회원
     List<InquirySummaryResponse> findMyInquiries(@Param("req") InquirySearchRequest req);
-    Long countMyInquiries(@Param("req") InquirySearchRequest req);
+    long countMyInquiries(@Param("req") InquirySearchRequest req);
     InquiryDetailResponse findMyInquiryById(@Param("userId") Long userId, @Param("id") Long id);
 
     // 관리자
     List<InquirySummaryResponse> findAdminInquiries(@Param("req") InquirySearchRequest req);
-    Long countAdminInquiries(@Param("req") InquirySearchRequest req);
+    long countAdminInquiries(@Param("req") InquirySearchRequest req);
     InquiryDetailResponse findAdminInquiryById(@Param("id") Long id);
 }

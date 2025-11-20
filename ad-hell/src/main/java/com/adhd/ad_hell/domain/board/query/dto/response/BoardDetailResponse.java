@@ -1,12 +1,14 @@
 package com.adhd.ad_hell.domain.board.query.dto.response;
 
 
+import com.adhd.ad_hell.domain.advertise.query.dto.response.AdFileDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -18,7 +20,6 @@ public class BoardDetailResponse {
     private Long id;
     private String title;
     private String content;
-    private String imageUrl;
     private String status;
     private Long viewCount;
 
@@ -34,4 +35,11 @@ public class BoardDetailResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+
+    private List<AdFileDto> files;
+
+    public void setFiles(List<AdFileDto> files) {
+        this.files = files;
+
+    }
 }

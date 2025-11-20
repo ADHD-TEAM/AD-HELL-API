@@ -97,6 +97,9 @@ public class BoardCommandService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
 
+        // 작성자 검증 공통 메서드 호출
+        verifyWriter(board);
+
         Category category = null;
         if (req.getCategoryId() != null) {
             category = categoryRepository.findById(req.getCategoryId())
@@ -113,6 +116,9 @@ public class BoardCommandService {
     public void deleteBoard(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+
+        // 작성자 검증
+        verifyWriter(board);
 
         // 물리 파일명 먼저 수집
         List<String> storedNames = board.getFiles().stream()
@@ -132,6 +138,9 @@ public class BoardCommandService {
     public int appendImagesBoard(Long boardId, List<MultipartFile> imageFiles) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+
+        // 작성자 검증
+        verifyWriter(board);
 
         List<String> storedNames = new ArrayList<>();
         int added = 0;
@@ -173,6 +182,9 @@ public class BoardCommandService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
 
+        // 작성자 검증
+        verifyWriter(board);
+
         boolean removed = removeFileEntity(board, storedName);
         if (!removed) throw new BusinessException(ErrorCode.FILE_NOT_FOUND);
 
@@ -181,6 +193,16 @@ public class BoardCommandService {
 
     /* ==================== Helpers ==================== */
 
+    // 작성자 검증 공통 메서드
+    private void verifyWriter(Board board) {
+        Long loginUserId = securityUtil.getLoginUserInfo().getUserId();
+        if (!board.getWriter().getUserId().equals(loginUserId)) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+    }
+
+    // 게시글 Board에 연결된 이미지 파일 중, 특정 storedName을 가진
+    // 파일 엔티티를 찾아 삭제하는 메서드
     private boolean removeFileEntity(Board board, String storedName) {
         for (Iterator<AdFile> it = board.getFiles().iterator(); it.hasNext();) {
             AdFile f = it.next();
@@ -197,7 +219,7 @@ public class BoardCommandService {
         return BoardCommandResponse.builder()
                 .id(board.getId())
                 .title(board.getTitle())
-                .writerId(board.getWriter().getUserId()) // ✅ getUserId 사용
+                .writerId(board.getWriter().getUserId())
                 .content(board.getContent())
                 .categoryId(board.getCategory().getId())
                 .status(board.getStatus())

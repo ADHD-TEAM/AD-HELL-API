@@ -1,12 +1,11 @@
 package com.adhd.ad_hell.domain.board.query.dto.response;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.adhd.ad_hell.domain.advertise.query.dto.response.AdFileDto;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -22,5 +21,11 @@ public class BoardSummaryResponse {
     private String writerName;
     private LocalDateTime createdAt;
 
+    @Setter(AccessLevel.NONE)
+    private List<AdFileDto> files;
 
+    public void setFiles(List<AdFileDto> files) {
+        this.files = files;
+
+    }
 }

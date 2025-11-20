@@ -95,9 +95,8 @@ public enum ApiEndpoint {
     INQUIRY_ANSWER(HttpMethod.PATCH, "/api/inquiries/admin/*/answer", Role.ADMIN),
     INQUIRY_MY_LIST(HttpMethod.GET,     "/api/inquiries/my",        Role.USER),
     INQUIRY_MY_DETAIL(HttpMethod.GET,   "/api/inquiries/my/*",      Role.USER),
-    INQUIRY_ADMIN_LIST(HttpMethod.GET,  "/api/inquiries/admin",     Role.ADMIN),
+    INQUIRY_ADMIN_LIST(HttpMethod.GET,  "/api/inquiries/admin",     null),
     INQUIRY_ADMIN_DETAIL(HttpMethod.GET,"/api/inquiries/admin/*",   Role.ADMIN),
-
 
     ;
     private final HttpMethod endpointStatus;

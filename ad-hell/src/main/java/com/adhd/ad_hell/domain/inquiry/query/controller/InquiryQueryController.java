@@ -31,7 +31,6 @@ public class InquiryQueryController {
     })
     @GetMapping("/my")
     public ResponseEntity<InquiryListResponse> getMyInquiries(InquirySearchRequest req) {
-        // 예: /api/inquiries/my?userId=1&page=1&size=20&keyword=...&answered=Y
         return ResponseEntity.ok(inquiryQueryService.getMyInquiries(req));
     }
 
@@ -69,7 +68,6 @@ public class InquiryQueryController {
     })
     @GetMapping("/admin")
     public ResponseEntity<InquiryListResponse> getAdminInquiries(InquirySearchRequest req) {
-        // 예: /api/inquiries/admin?page=1&size=20&keyword=...&answered=N
         return ResponseEntity.ok(inquiryQueryService.getAdminInquiries(req));
     }
 
