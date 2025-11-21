@@ -10,7 +10,6 @@
         <result column="category_id" property="categoryId"/>
         <result column="ad_id"       property="adId"/>
         <result column="score"       property="score"/>
-        <result column="rank"        property="rank"/>
         <result column="ranked_time" property="rankedTime"/>
     </resultMap>
 
@@ -21,11 +20,10 @@
             category_id,
             ad_id,
             score,
-            rank,
             ranked_time
         FROM ad_rank
         ORDER BY score DESC
-            LIMIT 20
+        LIMIT 20
     </select>
 
 </mapper>
